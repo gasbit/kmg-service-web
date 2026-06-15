@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  --background: #05080c;
+  --foreground: #f5f8fb;
+  --card: #10151b;
+  --card-foreground: #eef5fb;
+  --popover: #111820;
+  --popover-foreground: #eef5fb;
+  --primary: #56c8ff;
+  --primary-foreground: #03121d;
+  --secondary: #182632;
+  --secondary-foreground: #dceaf4;
+  --muted: #131a22;
+  --muted-foreground: #93a3b5;
+  --accent: #8be7ff;
+  --accent-foreground: #03121d;
+  --destructive: #ff6b7a;
+  --destructive-foreground: #fff7f8;
+  --border: color-mix(in srgb, #b9d8ec 16%, transparent);
+  --input: color-mix(in srgb, #b9d8ec 18%, transparent);
+  --ring: #56c8ff;
+  --surface: #0b1016;
+  --surface-raised: #151c24;
+  --surface-glow: color-mix(in srgb, #38bdf8 30%, transparent);
+  --surface-glow-strong: color-mix(in srgb, #7dd3fc 44%, transparent);
+  --shadow-color: color-mix(in srgb, #38bdf8 18%, transparent);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-glow: var(--surface-glow);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  color: var(--foreground);
+  background:
+    radial-gradient(circle at 14% 3%, var(--surface-glow-strong), transparent 32rem),
+    radial-gradient(circle at 88% 14%, var(--surface-glow), transparent 30rem),
+    linear-gradient(180deg, #071018 0%, var(--background) 34%, #030507 100%);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
