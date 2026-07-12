@@ -1,4 +1,9 @@
 import type { Metadata } from "next";
+import "@fontsource/kanit/400.css";
+import "@fontsource/kanit/500.css";
+import "@fontsource/kanit/600.css";
+import "@fontsource/kanit/700.css";
+import "@fontsource/kanit/800.css";
 import { ApiLoadingProvider } from "@/components/ui/api-loading-provider";
 import "./globals.css";
 

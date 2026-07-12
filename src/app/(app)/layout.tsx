@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-shell/app-sidebar";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
-import { TopBar } from "@/components/app-shell/top-bar";
 import { getCurrentUser } from "@/features/auth/server";
 
 export default async function AppLayout({
@@ -15,8 +14,7 @@ export default async function AppLayout({
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <AppSidebar />
-      <div>
-        <TopBar />
+      <div className="min-h-screen lg:pl-[248px]">
         {children}
         <MobileNav />
       </div>
