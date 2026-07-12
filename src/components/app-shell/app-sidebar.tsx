@@ -7,10 +7,10 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
     <Image
       alt="ร้านขวัญเมืองแก๊ส"
       className={`${compact ? "w-[190px]" : "w-[210px]"} h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.35)]`}
-      height={905}
+      height={1024}
       priority
       src="/brand/kmg-logo-2.png"
-      width={1738}
+      width={1536}
     />
   );
 }
