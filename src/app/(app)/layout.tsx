@@ -13,10 +13,10 @@ export default async function AppLayout({
   if (!user) redirect("/api/auth/session/clear");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <AppSidebar />
       <div>
-        <TopBar user={user} />
+        <TopBar />
         {children}
         <MobileNav />
       </div>

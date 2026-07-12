@@ -86,3 +86,8 @@ body {
   color: var(--primary-foreground);
   background: var(--primary);
 }
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}

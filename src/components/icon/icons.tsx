@@ -1,171 +1,74 @@
-import type { SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
+function Icon({ children, ...props }: IconProps & { children: ReactNode }) {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+      {children}
+    </svg>
+  );
+}
+
+const stroke = {
+  stroke: "currentColor",
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  strokeWidth: 1.8,
+};
+
+export function HomeIcon(props: IconProps) {
+  return <Icon {...props}><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" {...stroke} /></Icon>;
+}
+
+export function ReceiptIcon(props: IconProps) {
+  return <Icon {...props}><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-2-2 2-3-2-3 2-2-2-3 2V5a2 2 0 0 1 2-2Zm3 5h6m-6 4h6" {...stroke} /></Icon>;
+}
+
+export function TruckIcon(props: IconProps) {
+  return <Icon {...props}><path d="M3 5h11v12H3V5Zm11 5h4l3 3v4h-7v-7ZM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" {...stroke} /></Icon>;
+}
+
+export function BoxesIcon(props: IconProps) {
+  return <Icon {...props}><path d="m12 3 8 4-8 4-8-4 8-4Zm-8 4v10l8 4 8-4V7M12 11v10" {...stroke} /></Icon>;
+}
+
+export function ProductIcon(props: IconProps) {
+  return <Icon {...props}><path d="M8 3h8l1 4v3c0 1.1-.9 2-2 2H9a2 2 0 0 1-2-2V7l1-4Zm1 9v9h6v-9M7 7h10" {...stroke} /></Icon>;
+}
+
+export function LoanIcon(props: IconProps) {
+  return <Icon {...props}><path d="M5 4h14v16H5V4Zm4 4h6m-6 4h6m-6 4h3" {...stroke} /></Icon>;
+}
+
+export function HistoryIcon(props: IconProps) {
+  return <Icon {...props}><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6M4 4v4.6h4.6M12 8v4l3 2" {...stroke} /></Icon>;
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return <Icon {...props}><path d="m7 9.5 5 5 5-5" {...stroke} /></Icon>;
+}
+
+export function MenuIcon(props: IconProps) {
+  return <Icon {...props}><path d="M4 7h16M4 12h16M4 17h16" {...stroke} /></Icon>;
+}
+
+export function CloseIcon(props: IconProps) {
+  return <Icon {...props}><path d="m6 6 12 12M18 6 6 18" {...stroke} /></Icon>;
+}
+
+export function BellIcon(props: IconProps) {
+  return <Icon {...props}><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 12h4" {...stroke} /></Icon>;
+}
+
+export function CalendarIcon(props: IconProps) {
+  return <Icon {...props}><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Zm2-2v4m10-4v4M3 9h18m-14 4h3m4 0h3m-10 4h3" {...stroke} /></Icon>;
+}
+
 export function UserIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 1 0-14 0"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
+  return <Icon {...props}><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 1 0-14 0" {...stroke} /></Icon>;
 }
 
-export function LockIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M7 10V8a5 5 0 0 1 10 0v2m-9 0h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-export function EyeIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-      <path
-        d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-export function EyeOffIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="m3 3 18 18M10.6 10.6a3 3 0 0 0 3.8 3.8M9.4 5.5A10 10 0 0 1 12 5c6 0 9.5 7 9.5 7a15.5 15.5 0 0 1-2.8 3.8M6.6 6.9C3.9 8.7 2.5 12 2.5 12s3.5 7 9.5 7c1.5 0 2.9-.4 4.1-1"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-export function ShieldLockIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 48 48"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M24 5 10 10.8v11.9c0 8.6 5.7 16.4 14 19.3 8.3-2.9 14-10.7 14-19.3V10.8L24 5Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.8"
-      />
-      <path
-        d="M18 24h12v10H18V24Zm3.2 0v-3.2a2.8 2.8 0 0 1 5.6 0V24"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.8"
-      />
-    </svg>
-  );
-}
-
-export function ShieldCheckIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 48 48"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M24 5 10 10.8v11.9c0 8.6 5.7 16.4 14 19.3 8.3-2.9 14-10.7 14-19.3V10.8L24 5Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.8"
-      />
-      <path
-        d="m17 24.4 4.7 4.7L31.5 19"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="3.2"
-      />
-    </svg>
-  );
-}
-
-export function SpeedIcon(props: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      viewBox="0 0 48 48"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M24 42c9.4 0 17-7.6 17-17S33.4 8 24 8 7 15.6 7 25c0 4.4 1.7 8.4 4.4 11.4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.8"
-      />
-      <path
-        d="M24 14v11l7 4M24 4v4M4 25h4M40 25h4M8 13l3 3"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.8"
-      />
-    </svg>
-  );
+export function FlameIcon(props: IconProps) {
+  return <Icon {...props}><path d="M13.5 2.5c.7 4-2.4 4.8-1.8 8.2.5-1.4 1.5-2.2 2.8-3 2.2 2 3.5 4.2 3.5 6.8a6 6 0 0 1-12 0c0-3.8 2.2-7.7 7.5-12Z" {...stroke} /></Icon>;
 }
