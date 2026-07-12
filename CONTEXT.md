@@ -1,4 +1,4 @@
-# KMG-SERVICE-WEB Context
+# KMG-SERVICE-WEB บริบท Frontend
 
 เอกสารนี้สรุป context สำคัญของ `KMG-SERVICE-WEB` จากเอกสารหลักของระบบ ได้แก่ `Context.md`, `Frontend-Architecture.md`, `Backend-Architecture.md`, `Database-Design.md` และ `Planning.md`
 
@@ -92,7 +92,7 @@ Transaction คือแกนหลักของระบบ ร้านแ�
 - `queue_no` ต้องกันเลขชนกันผ่าน transaction/unique index ฝั่ง database
 - รายการ delivery ควรตัด stock ตอนเปลี่ยนเป็น `COMPLETED` ไม่ใช่ตอนสร้างรายการ เพราะอาจถูกยกเลิกก่อนส่งจริง
 
-### Status Flow
+### Flow สถานะ
 
 สถานะ transaction:
 
@@ -178,7 +178,7 @@ Dashboard service ฝั่ง backend ควรเป็น read-only aggregati
 
 ## 3. ข้อจำกัด
 
-### Frontend Boundary
+### ขอบเขต Frontend
 
 Frontend ไม่ใช่ source of truth ของ business workflow
 
@@ -199,7 +199,7 @@ Frontend ห้ามทำ:
 - เก็บ JWT access token ใน `localStorage`, `sessionStorage` หรือ client-readable cookie
 - bypass authorization ด้วย frontend-only guard
 
-### Backend Authority
+### สิทธิ์ตัดสินใจของ Backend
 
 Backend เป็นเจ้าของ:
 
@@ -237,7 +237,7 @@ Backend เป็นเจ้าของ:
 - Separate mobile app
 - Multi-branch
 
-### Data Integrity Constraints
+### ข้อจำกัดด้านความถูกต้องของข้อมูล
 
 - ข้อมูลสำคัญควรใช้ soft delete
 - Transaction ต้องมี snapshot ของลูกค้าและสินค้า
@@ -246,7 +246,7 @@ Backend เป็นเจ้าของ:
 - ทุก status change ต้องมี log
 - Repository ไม่ควรคุม transaction boundary เอง
 
-### Frontend Runtime Notes
+### หมายเหตุ Runtime ของ Frontend
 
 - Project ใช้ Next.js `16.2.9` ซึ่งมี breaking changes และ deprecation ใหม่
 - `middleware.ts` ยังมีใน architecture เดิม แต่ Next.js 16 เตือนว่า file convention นี้ deprecated และแนะนำ `proxy.ts`
@@ -254,7 +254,7 @@ Backend เป็นเจ้าของ:
 
 ## 4. Technology
 
-### Current Frontend Stack
+### Frontend Stack ปัจจุบัน
 
 จาก `KMG-SERVICE-WEB/package.json`:
 
@@ -276,7 +276,33 @@ Frontend architecture:
 - Client Components เฉพาะส่วน interactive
 - Feature-oriented folder structure
 
-Recommended frontend tools from architecture:
+### Visual Design Concept: Glass Operational UI
+
+Visual direction หลักของระบบคือ `Glass Operational UI` โดยใช้พื้นผิวโปร่งแสง, backdrop blur, border highlight และ shadow ที่นุ่มเพื่อสร้าง depth บนพื้นหลังสีน้ำเงินเข้ม/gradient แต่ยังต้องรักษาความชัดเจนแบบ operational tool ที่ใช้งานทุกวัน
+
+กติกาหลัก:
+
+- ใช้ glass เป็น surface สำคัญ เช่น authentication card, modal, loading overlay, dialog, summary panel หรือ highlighted workflow เท่านั้น
+- Data table, form ที่มีข้อมูลหนาแน่น และพื้นที่อ่านข้อมูลจำนวนมากควรใช้ surface ที่ทึบกว่า เพื่อรักษา contrast และลด visual noise
+- Reuse `Card` และ `CardContent` จาก `src/components/ui/card.tsx` ด้วย `variant="glass"` แทนการเขียน glass classes ซ้ำใน page หรือ feature component
+- Loading modal ต้องใช้ glass card pattern เดียวกับ Login ผ่าน shared `LoadingModal` ใน `src/components/ui/loading.tsx`
+- ถ้าต้องเพิ่ม glass pattern ใหม่ ให้ขยาย domain-neutral variant ใน shared component ก่อน แล้วจึงนำไปใช้ใน feature
+- ใช้ Tailwind CSS และ design tokens/CSS variables ที่มีอยู่ เช่น `brand-navy`, `brand-blue`, `brand-cyan`, translucent white borders และ shared shadow values
+- รักษาลำดับชั้นด้วยการมี primary glass surface จำนวนน้อย ห้ามทำให้ทุก card, row หรือ control เป็น glass พร้อมกัน
+- ข้อความและ interactive controls ต้องมี contrast เพียงพอทั้งบนพื้นหลังสว่างและมืด; ห้ามพึ่งความโปร่งใสหรือสีเพียงอย่างเดียวในการสื่อสถานะ
+- Backdrop blur เป็น enhancement ไม่ใช่เงื่อนไขของการอ่าน UI; เมื่อ blur แสดงผลไม่ได้ surface ยังต้องอ่านได้จากสีพื้น, border และ contrast
+- Motion บน glass surface ต้องสุภาพและรองรับ `prefers-reduced-motion`
+
+Shared patterns ปัจจุบัน:
+
+| Pattern | Shared component | ใช้สำหรับ |
+| --- | --- | --- |
+| Glass surface | `Card`, `CardContent` with `variant="glass"` | Login card, modal และ highlighted panel |
+| Global API loading | `ApiLoadingProvider`, `LoadingModal` | Client-side API request overlay |
+| Route/data loading | `LoadingState`, `Skeleton`, `loading.tsx` | Server route transition และ section loading |
+| Inline pending | `Button isLoading`, `LoadingSpinner` | Form submit และ mutation action |
+
+เครื่องมือ frontend ที่แนะนำจาก architecture:
 
 - UI components: shadcn/ui หรือ local component system ที่ต่อยอดจาก Radix UI
 - Icons: lucide-react
@@ -289,7 +315,7 @@ Recommended frontend tools from architecture:
 - Testing: Vitest, React Testing Library, Playwright
 - Formatting: Prettier
 
-### Backend Recommended Stack
+### Backend Stack ที่แนะนำ
 
 จาก backend architecture:
 
@@ -311,7 +337,7 @@ Backend architecture:
 - Versioned API path: `/api/v1`
 - Standard response format `{ success, data, meta }` และ `{ success, error, meta }`
 
-### API Integration Expectations
+### ความคาดหวังในการเชื่อม API
 
 Environment concept:
 
@@ -328,7 +354,7 @@ Frontend should:
 - Normalize success/error responses through `src/lib/api`
 - Revalidate relevant paths after mutations
 
-Important routes:
+Routes สำคัญ:
 
 - Frontend login page: `/login`
 - Frontend dashboard: `/dashboard`
@@ -336,7 +362,7 @@ Important routes:
 - Backend auth API: `/api/v1/auth/login`, `/api/v1/auth/me`
 - Backend dashboard API: `/api/v1/dashboard/today`
 
-### Development Commands
+### Commands สำหรับพัฒนา
 
 Run from `KMG-SERVICE-WEB`.
 

@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KMG-SERVICE-WEB
 
-## Getting Started
+`KMG-SERVICE-WEB` คือ Next.js frontend สำหรับระบบจัดการร้านแก๊ส `KMG-SERVICE`
 
-First, run the development server:
+โปรเจกต์นี้ใช้สำหรับหน้าจอ Admin ใน MVP เช่น Dashboard, Products, Transactions, Queues, Loans และ Inventory
+
+## เริ่มต้นใช้งาน
+
+รัน development server:
 
 ```bash
 npm run dev
-# or
+```
+
+หรือใช้ package manager อื่นถ้าจำเป็น:
+
+```bash
 yarn dev
-# or
 pnpm dev
-# or
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+เปิด [http://localhost:3000](http://localhost:3000) ใน browser เพื่อดูผลลัพธ์
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## คำสั่งหลัก
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+```
 
-## Learn More
+เริ่ม local development server
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+รัน ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+```
 
-## Deploy on Vercel
+สร้าง production build และตรวจ route/type compilation ของ Next.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+เริ่ม production server หลัง build สำเร็จ
+
+## เอกสารที่ควรอ่านก่อนแก้ Code
+
+ก่อนแก้ frontend code ให้อ่าน:
+
+1. `../Context.md`
+2. `../Business-Flow.md`
+3. `../Frontend-Architecture.md`
+4. `./Frontend-Implement-Plan.md`
+5. `./AGENTS.md`
+
+ถ้างานแตะ business rules เช่น transactions, queues, loans, inventory, status changes หรือ snapshots ให้อ่าน `../Database-Design.md` เพิ่มด้วย
+
+## เอกสาร Next.js
+
+โปรเจกต์ใช้ Next.js App Router และเวอร์ชันใน repo อาจมี API/convention ต่างจากความรู้ทั่วไป ก่อนใช้ API ใหม่ให้อ่านเอกสารใน `node_modules/next/dist/docs/` หรือเอกสารทางการของ Next.js

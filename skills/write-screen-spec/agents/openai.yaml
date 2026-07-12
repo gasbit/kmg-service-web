@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Screen Spec"
+  short_description: "Draft implementation-ready frontend screen specs"
+  default_prompt: "Use $write-screen-spec to create an implementation-ready specification for this screen."

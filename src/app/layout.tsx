@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ApiLoadingProvider } from "@/components/ui/api-loading-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ApiLoadingProvider>{children}</ApiLoadingProvider>
+      </body>
     </html>
   );
 }

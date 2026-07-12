@@ -3,31 +3,39 @@
 :root {
   color-scheme: dark;
 
-  --background: #05080c;
-  --foreground: #f5f8fb;
-  --card: #10151b;
-  --card-foreground: #eef5fb;
-  --popover: #111820;
-  --popover-foreground: #eef5fb;
-  --primary: #56c8ff;
-  --primary-foreground: #03121d;
-  --secondary: #182632;
-  --secondary-foreground: #dceaf4;
-  --muted: #131a22;
-  --muted-foreground: #93a3b5;
-  --accent: #8be7ff;
-  --accent-foreground: #03121d;
-  --destructive: #ff6b7a;
+  --background: #030817;
+  --foreground: #f7fbff;
+  --card: #08142b;
+  --card-foreground: #f1f7ff;
+  --popover: #091936;
+  --popover-foreground: #f1f7ff;
+  --primary: #126fff;
+  --primary-foreground: #ffffff;
+  --secondary: #102a56;
+  --secondary-foreground: #e7f1ff;
+  --muted: #132442;
+  --muted-foreground: #95a6c3;
+  --accent: #18c8ff;
+  --accent-foreground: #021226;
+  --destructive: #e50914;
   --destructive-foreground: #fff7f8;
-  --border: color-mix(in srgb, #b9d8ec 16%, transparent);
-  --input: color-mix(in srgb, #b9d8ec 18%, transparent);
-  --ring: #56c8ff;
-  --surface: #0b1016;
-  --surface-raised: #151c24;
-  --surface-glow: color-mix(in srgb, #38bdf8 30%, transparent);
-  --surface-glow-strong: color-mix(in srgb, #7dd3fc 44%, transparent);
-  --shadow-color: color-mix(in srgb, #38bdf8 18%, transparent);
+  --border: color-mix(in srgb, #c8dcf8 18%, transparent);
+  --input: color-mix(in srgb, #c8dcf8 20%, transparent);
+  --ring: #18c8ff;
+  --surface: #061026;
+  --surface-raised: #0a1b38;
+  --surface-glow: color-mix(in srgb, #126fff 36%, transparent);
+  --surface-glow-strong: color-mix(in srgb, #18c8ff 42%, transparent);
+  --brand-navy: #03133a;
+  --brand-navy-deep: #020817;
+  --brand-blue: #126fff;
+  --brand-blue-strong: #0036bf;
+  --brand-cyan: #18c8ff;
+  --brand-red: #e50914;
+  --brand-steel: #d8e6f8;
+  --shadow-color: color-mix(in srgb, #126fff 20%, transparent);
   --radius: 0.75rem;
+  --font-kanit: "Kanit", "Noto Sans Thai", Arial, Helvetica, sans-serif;
 }
 
 @theme inline {
@@ -53,21 +61,25 @@
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-surface-glow: var(--surface-glow);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-deep: var(--brand-navy-deep);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-strong: var(--brand-blue-strong);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-red: var(--brand-red);
+  --color-brand-steel: var(--brand-steel);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-kanit), Arial, Helvetica, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 body {
   color: var(--foreground);
-  background:
-    radial-gradient(circle at 14% 3%, var(--surface-glow-strong), transparent 32rem),
-    radial-gradient(circle at 88% 14%, var(--surface-glow), transparent 30rem),
-    linear-gradient(180deg, #071018 0%, var(--background) 34%, #030507 100%);
-  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(180deg, #07183f 0%, var(--background) 38%, #02050d 100%);
+  font-family: var(--font-kanit), Arial, Helvetica, sans-serif;
 }
 
 ::selection {
