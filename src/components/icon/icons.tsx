@@ -65,6 +65,16 @@ export function CalendarIcon(props: IconProps) {
   return <Icon {...props}><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Zm2-2v4m10-4v4M3 9h18m-14 4h3m4 0h3m-10 4h3" {...stroke} /></Icon>;
 }
 
+export function SearchIcon(props: IconProps) { return <Icon {...props}><circle cx="11" cy="11" r="7" {...stroke} /><path d="m20 20-4-4" {...stroke} /></Icon>; }
+export function PlusIcon(props: IconProps) { return <Icon {...props}><path d="M12 5v14M5 12h14" {...stroke} /></Icon>; }
+export function RefreshIcon(props: IconProps) { return <Icon {...props}><path d="M20 7v5h-5M4 17v-5h5M6.1 8a7 7 0 0 1 11.5-2.2L20 8M4 16l2.4 2.2A7 7 0 0 0 17.9 16" {...stroke} /></Icon>; }
+export function EditIcon(props: IconProps) { return <Icon {...props}><path d="m4 20 4.2-1 10.6-10.6a2 2 0 0 0-2.8-2.8L5.4 16.2 4 20Zm10.5-13 2.8 2.8" {...stroke} /></Icon>; }
+export function TrashIcon(props: IconProps) { return <Icon {...props}><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6" {...stroke} /></Icon>; }
+export function PackageIcon(props: IconProps) { return <Icon {...props}><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10" {...stroke} /></Icon>; }
+export function CheckCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="m8 12 2.5 2.5L16 9" {...stroke} /></Icon>; }
+export function PauseCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M10 9v6m4-6v6" {...stroke} /></Icon>; }
+export function ArrowLeftIcon(props: IconProps) { return <Icon {...props}><path d="m15 18-6-6 6-6" {...stroke} /></Icon>; }
+
 export function UserIcon(props: IconProps) {
   return <Icon {...props}><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 1 0-14 0" {...stroke} /></Icon>;
 }

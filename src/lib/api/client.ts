@@ -10,6 +10,16 @@ type ApiClientOptions = Omit<RequestInit, "body"> & {
 export const API_BASE_URL = process.env.API_BASE_URL ?? "http://localhost:4000/api";
 
 export async function apiClient<T>(path: string, options: ApiClientOptions = {}) {
+  const payload = await request<T>(path, options);
+  return payload.data;
+}
+
+export async function apiClientWithMeta<T>(path: string, options: ApiClientOptions = {}) {
+  const payload = await request<T>(path, options);
+  return { data: payload.data, meta: payload.meta };
+}
+
+async function request<T>(path: string, options: ApiClientOptions = {}) {
   const token = await readAuthToken();
   const url = buildUrl(path, options.query);
   const headers = new Headers(options.headers);
@@ -39,7 +49,7 @@ export async function apiClient<T>(path: string, options: ApiClientOptions = {})
     );
   }
 
-  return payload.data;
+  return payload;
 }
 
 function buildUrl(path: string, query?: ApiClientOptions["query"]) {
