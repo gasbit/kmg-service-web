@@ -72,3 +72,27 @@ export function UserIcon(props: IconProps) {
 export function FlameIcon(props: IconProps) {
   return <Icon {...props}><path d="M13.5 2.5c.7 4-2.4 4.8-1.8 8.2.5-1.4 1.5-2.2 2.8-3 2.2 2 3.5 4.2 3.5 6.8a6 6 0 0 1-12 0c0-3.8 2.2-7.7 7.5-12Z" {...stroke} /></Icon>;
 }
+
+export function LockIcon(props: IconProps) {
+  return <Icon {...props}><path d="M7 10V8a5 5 0 0 1 10 0v2m-9 0h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z" {...stroke} /></Icon>;
+}
+
+export function EyeIcon(props: IconProps) {
+  return <Icon {...props}><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" {...stroke} /><circle cx="12" cy="12" r="3" {...stroke} /></Icon>;
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return <Icon {...props}><path d="m3 3 18 18M10.6 10.6a3 3 0 0 0 3.8 3.8M9.4 5.5A10 10 0 0 1 12 5c6 0 9.5 7 9.5 7a15.5 15.5 0 0 1-2.8 3.8M6.6 6.9C3.9 8.7 2.5 12 2.5 12s3.5 7 9.5 7c1.5 0 2.9-.4 4.1-1" {...stroke} /></Icon>;
+}
+
+export function ShieldLockIcon(props: IconProps) {
+  return <Icon {...props}><path d="M12 2.5 5 5.4v6c0 4.3 2.9 8.2 7 9.6 4.1-1.4 7-5.3 7-9.6v-6L12 2.5Z" {...stroke} /><path d="M9 12h6v5H9v-5Zm1.6 0v-1.6a1.4 1.4 0 0 1 2.8 0V12" {...stroke} /></Icon>;
+}
+
+export function ShieldCheckIcon(props: IconProps) {
+  return <Icon {...props}><path d="M12 2.5 5 5.4v6c0 4.3 2.9 8.2 7 9.6 4.1-1.4 7-5.3 7-9.6v-6L12 2.5Z" {...stroke} /><path d="m8.5 12.2 2.3 2.3 4.9-5" {...stroke} /></Icon>;
+}
+
+export function SpeedIcon(props: IconProps) {
+  return <Icon {...props}><path d="M4.8 18.2A9 9 0 1 1 19.2 18M12 5v2M3 14h2m14 0h2M5.6 7.6 7 9m10-1.4L15.6 9M12 14l4-3" {...stroke} /></Icon>;
+}
