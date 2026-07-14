@@ -34,8 +34,11 @@ export type ProductPagination = { page: number; limit: number; totalItems: numbe
 export type ProductWriteInput = Pick<Product, "brand" | "weightKg" | "exchangeCostPrice" | "exchangeSalePrice" | "fullTankPrice">;
 
 export type ProductActionState = {
+  imageUploadFailed?: boolean;
   ok: boolean;
   message: string;
+  productId?: string;
+  productSaved?: boolean;
   requestId?: string;
   fieldErrors?: Partial<Record<keyof ProductWriteInput, string>>;
 };

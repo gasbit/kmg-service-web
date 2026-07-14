@@ -1,5 +1,5 @@
 import { apiClient, apiClientWithMeta } from "@/lib/api/client";
-import type { Product, ProductListQuery, ProductPagination, ProductWriteInput } from "./product.types";
+import type { Product, ProductImage, ProductListQuery, ProductPagination, ProductWriteInput } from "./product.types";
 
 export async function getProducts(query: ProductListQuery = {}) {
   const result = await apiClientWithMeta<{ products: Product[] }>("/products", { cache: "no-store", query });
@@ -14,3 +14,4 @@ export function getProduct(id: string) { return apiClient<Product>(`/products/${
 export function createProduct(input: ProductWriteInput) { return apiClient<Product>("/products", { method: "POST", body: input }); }
 export function updateProduct(id: string, input: Partial<ProductWriteInput> & { isActive?: boolean }) { return apiClient<Product>(`/products/${id}`, { method: "PATCH", body: input }); }
 export function deactivateProduct(id: string) { return apiClient<Product>(`/products/${id}`, { method: "DELETE" }); }
+export function uploadProductImage(productId: string, formData: FormData) { return apiClient<ProductImage>(`/products/${productId}/images`, { method: "POST", body: formData }); }

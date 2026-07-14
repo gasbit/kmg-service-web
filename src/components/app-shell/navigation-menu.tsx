@@ -26,13 +26,14 @@ const navigation = [
   },
   { href: "/queues", label: "คิวส่งแก๊ส", icon: TruckIcon },
   {
-    href: "/inventory",
+    href: "/products",
     label: "คลังสินค้า",
     icon: BoxesIcon,
     children: [
-      { href: "/inventory", label: "สต็อก" },
       { href: "/products", label: "สินค้า" },
-      { href: "/inventory/movements", label: "ประวัติการเคลื่อนไหว" },
+      // HOLD: รอ business decision เรื่อง stock balance, movement และ adjustment ก่อนเปิดเมนู Inventory
+      // { href: "/inventory", label: "สต็อก" },
+      // { href: "/inventory/movements", label: "ประวัติการเคลื่อนไหว" },
     ],
   },
   { href: "/loans", label: "รายการยืมถัง", icon: LoanIcon },

@@ -11,26 +11,26 @@ Frontend ปัจจุบันมีโครงสร้าง Next.js App R
 1. Routes หลักมีแล้ว เช่น `/login`, `/dashboard`, `/products`, `/transactions`, `/queues`, `/loans`, `/inventory`
 2. Feature folders มีแล้ว เช่น `auth`, `dashboard`, `products`, `transactions`, `queues`, `loans`, `inventory`
 3. Shared folders มีแล้ว เช่น `components/ui`, `components/app-shell`, `lib/api`, `lib/auth`, `lib/format`, `lib/hooks`
-4. Foundation ฝั่ง API/auth มี implementation แล้ว แต่หลาย feature ยังเป็น stub หรือยังต้องเติม contract จริง เช่น DTO types, forms, tables, dashboard widgets และ mutation actions
+4. Foundation ฝั่ง API/auth และ Products มี implementation แล้ว แต่ feature อื่นยังเป็น stub หรือยังต้องเติม contract จริง เช่น DTO types, forms, tables, dashboard widgets และ mutation actions
 
 แผน implement นี้จึงเน้นการเติมระบบให้ครบตาม MVP แทนการ scaffold ใหม่จากศูนย์
 
 ### 1.1 Checklist ภาพรวมจาก Code จริง
 
-ตรวจล่าสุดวันที่ `2026-07-04` จาก source code ใน `KMG-SERVICE-WEB/src` และ routes/schemas ใน `KMG-SERVICE-API/src` พบว่า frontend มี foundation และ auth login integration แล้ว แต่ feature business หลักส่วนใหญ่ยังอยู่ระดับ skeleton และยังไม่ใช่ MVP ที่ใช้งาน flow จริงได้ครบ
+ตรวจล่าสุดวันที่ `2026-07-14` จาก source code ใน `KMG-SERVICE-WEB/src` และ product contract ใน `KMG-SERVICE-API/src` พบว่า frontend มี foundation, auth login integration และ Products implementation แล้ว แต่ feature business อื่นส่วนใหญ่ยังอยู่ระดับ skeleton และยังไม่ใช่ MVP ที่ใช้งาน flow จริงได้ครบ
 
 - [ ] Phase 0: จัด Alignment และ Contract
   สถานะ: `Partial` - ตรวจ endpoint/schema backend รอบล่าสุดแล้ว แต่ยังต้องสรุป response DTO และ mapping error code ให้ครบก่อน implement feature
 - [x] Phase 1: วางรากฐาน
   สถานะ: `Done` - มี API client, response/error model, auth cookie/session helper และ route guard ผ่าน Next.js 16 `proxy`
 - [ ] Phase 2: Shared UI และ App Shell
-  สถานะ: `Partial` - `TopBar` แสดง current user/logout แล้ว แต่ `AppSidebar` และ `MobileNav` ยังต้องเติม navigation จริง
+  สถานะ: `Partial` - `TopBar`, `AppSidebar`, `MobileNav` และ navigation หลักใช้งานแล้ว; ยังต้องเติม behavior/coverage ของ shared UI บางส่วนและทำ browser responsive/accessibility QA
 - [x] Phase 3: Auth
   สถานะ: `Implemented, pending browser E2E` - login/logout route handlers, form submit, httpOnly cookie, current user และ logout action ทำแล้ว; backend HTTP login smoke test ผ่านหลังแก้ API validate middleware แต่ยังต้องลองผ่าน browser หลัง restart backend port 4000
 - [ ] Phase 4: Dashboard
   สถานะ: `Todo` - `getDashboardData()` ยังคืน `null`, widget ยังว่าง
-- [ ] Phase 5: Products
-  สถานะ: `Todo` - API/types/schema/form/table ยังเป็น placeholder
+- [x] Phase 5: Products
+  สถานะ: `Implemented, pending browser/API E2E` - list/search/filter/pagination, create/edit, activate/deactivate, loading/error states และ product image upload implement แล้ว; lint/build ผ่าน แต่ยังไม่ได้ทดสอบ mutation ครบกับ authenticated browser และ backend จริง
 - [ ] Phase 6: Transactions
   สถานะ: `Todo` - create form, history table, detail และ status actions ยังเป็น placeholder
 - [ ] Phase 7: Queue
@@ -38,14 +38,15 @@ Frontend ปัจจุบันมีโครงสร้าง Next.js App R
 - [ ] Phase 8: Loans
   สถานะ: `Todo` - loan API/table/return dialog ยังเป็น placeholder
 - [ ] Phase 9: Inventory
-  สถานะ: `Todo` - inventory API/tables/adjustment form ยังเป็น placeholder
+  สถานะ: `Hold` - รอ business decision เรื่อง stock balance, movement, adjustment และ timing ที่อนุมัติแล้ว; ซ่อนเมนู Stock/Inventory ไว้ก่อน แต่ยังเก็บ route/source สำหรับพัฒนาต่อในอนาคต
 - [ ] Phase 10: ทำให้ระบบพร้อมใช้งาน
-  สถานะ: `Partial` - เคยมีผล `npm run lint` และ `npm run build` ผ่านสำหรับ auth integration, backend HTTP login ผ่านแล้ว แต่รอบตรวจ `2026-07-04` ยังไม่ได้ rerun เพราะ `git status` ติด Command Line Tools (`xcrun`) ของเครื่อง และยังไม่ได้ทดสอบ browser E2E หลัง restart backend runtime
+  สถานะ: `Partial` - `npm run lint` และ production build ผ่านล่าสุดวันที่ `2026-07-14` หลังเพิ่ม product image upload/hold Inventory menu; ยังขาด authenticated browser E2E และ feature อื่นยังไม่ครบ
 
 งานปัจจุบัน:
 
 - [ ] ปิด Phase 0 ให้ครบ โดยสรุป response DTO จาก service/repository ฝั่ง backend และอัปเดต frontend types ตาม contract จริง
 - [ ] ทดสอบ auth ผ่าน browser จริงหลัง restart backend port `4000`
+- [ ] ทดสอบ Products ผ่าน authenticated browser กับ backend จริง: list/search/create/edit/activate/deactivate/upload/retry
 - [ ] เริ่มเชื่อม Dashboard เป็น feature แรกหลัง foundation พร้อม
 
 งานถัดไปที่ควรเริ่มก่อน:
@@ -55,9 +56,11 @@ Frontend ปัจจุบันมีโครงสร้าง Next.js App R
 - [x] Implement auth cookie/session helpers
 - [x] Implement login/logout route handlers และ actions
 - [x] Implement route guard ด้วย Next.js 16 `proxy`
-- [ ] สรุป response DTO จริงจาก backend service/repository สำหรับ Dashboard, Products, Transactions, Queue, Loans และ Inventory
+- [x] สรุป Product DTO และ product image contract จาก backend implementation/spec
+- [ ] สรุป response DTO จริงจาก backend service/repository สำหรับ Dashboard, Transactions, Queue และ Loans; Inventory `Hold`
 - [ ] Implement `src/features/dashboard/*` ให้เรียก `GET /dashboard/today` และแสดง widgets จริง
-- [ ] Implement navigation จริงใน `AppSidebar` และ `MobileNav`
+- [x] Implement navigation จริงใน `AppSidebar` และ `MobileNav` โดยซ่อน Inventory ระหว่าง `Hold`
+- [ ] ทำ authenticated browser QA สำหรับ navigation ทั้ง desktop/mobile และ accessibility
 
 ### 1.2 รายละเอียดสถานะจากการตรวจ Code จริง
 
@@ -72,22 +75,22 @@ Legend:
 | --- | --- | --- | --- |
 | Route structure | `Partial` | มี routes หลักใต้ `src/app/(app)` และ `src/app/(auth)` | เติม data fetching, actions, loading/error states และ auth guard |
 | Shared UI primitives | `Partial` | มี `src/components/ui/*` และ `src/components/icon/icons.tsx` | ตรวจ coverage ของ state, validation, table actions และ responsive behavior |
-| App shell | `Partial` | `TopBar` แสดง current user และ logout แล้ว แต่ `AppSidebar` / `MobileNav` ยังเป็น shell เปล่า | เติม navigation จริงและ mobile behavior |
-| API client foundation | `Done` | `src/lib/api/client.ts` เรียก backend ผ่าน `fetch`, อ่าน token จาก cookie และแนบ `Authorization` | เพิ่ม query params helper เมื่อ feature ถัดไปต้องใช้ |
+| App shell | `Partial` | `TopBar`, `AppSidebar`, `MobileNav` และ `NavigationMenu` มี navigation จริงแล้ว; Inventory menu ถูก hold ตาม business decision | ทำ authenticated browser responsive/accessibility QA |
+| API client foundation | `Done` | `src/lib/api/client.ts` เรียก backend ผ่าน `fetch`, อ่าน token จาก cookie, แนบ `Authorization`, รองรับ query/meta และ `FormData` | ขยายเฉพาะเมื่อ feature contract ใหม่ต้องใช้ |
 | API response/error model | `Done` | `src/lib/api/response.ts` และ `src/lib/api/errors.ts` รองรับ standard response, `ApiError`, `requestId` และ error mapping | ขยาย mapping ตาม error code จริงจาก backend เพิ่มเติม |
 | Auth | `Implemented, pending browser E2E` | login form submit ไป `/api/auth/login`, route handler set httpOnly cookie, logout clear cookie, current user เรียก `/auth/me`; backend HTTP login smoke test ผ่านด้วย `admin_kmg` | Restart backend port 4000 แล้วทดสอบ login ผ่าน browser จริง |
 | Route guard | `Done` | ใช้ `src/proxy.ts` redirect unauthenticated user ไป `/login` และ redirect logged-in user จาก `/login` ไป `/dashboard` | เพิ่ม permission/role guard เมื่อ backend ส่งสิทธิ์ละเอียดขึ้น |
 | Dashboard | `Todo` | `getDashboardData()` คืน `null`, `DashboardData = Record<string, never>`, `TodayDashboard` เป็น section เปล่า | เชื่อม `/dashboard/today`, สร้าง DTO และ widgets |
-| Products | `Todo` | `getProducts()` คืน `[]`, `Product = Record<string, never>`, form/table เป็น placeholder; backend route จริงคือ `PATCH /products/:id` สำหรับ update | Implement list/create/edit/soft delete และ schema จริง |
+| Products | `Implemented, pending browser/API E2E` | มี typed DTO/schema/API wrappers, server list/search/filter/pagination, create/edit form, activate/deactivate, responsive table/states และ image upload ผ่าน frontend Route Handler | ทดสอบ authenticated E2E กับ backend จริง รวม upload failure/retry และตรวจ mobile |
 | Transactions | `Todo` | `getTransactions()` คืน `[]`, `Transaction = Record<string, never>`, form/table/detail เป็น placeholder; backend มี create/list/detail/status/cancel routes แล้ว | Implement create/history/detail/status/cancel actions และ transaction type logic ฝั่ง UI |
 | Queues | `Todo` | `getQueues()` คืน `[]`, `Queue = Record<string, never>`, board เป็น placeholder; backend มี `/queues/today`, `/queues?date=...`, `PATCH /queues/:transactionId/status` | Implement today queue, dated queue และ status update actions |
 | Loans | `Todo` | `getLoans()` คืน `[]`, `Loan = Record<string, never>`, return dialog เป็น placeholder; backend mount จริงคือ `/loans` ไม่ใช่ `/cylinder-loans` | Implement list/active/detail และ return loan flow |
-| Inventory | `Todo` | `getInventory()` คืน `[]`, types เป็น `Record<string, never>`, tables/form เป็น placeholder; backend มี balances/movements/adjustments routes แล้ว | Implement balances, movements และ adjustment form |
-| Types and schemas | `Todo` | หลาย feature ยังใช้ `Record<string, never>` และ schema เป็น `{}` | สร้าง DTO/types/schema จริงให้ตรง backend contract |
-| Revalidation after mutation | `Todo` | ยังไม่มี mutation จริง | เพิ่ม revalidate path ตาม revalidation matrix |
-| Lint/build verification | `Needs rerun` | เอกสารเดิมระบุว่า `npm run lint` และ `npm run build` ผ่านแล้ว แต่รอบตรวจล่าสุดยังไม่ได้ rerun; `git status` ใช้ไม่ได้เพราะ `xcrun` missing | หลังแก้ feature ถัดไปให้ rerun lint/build และ browser E2E |
+| Inventory | `Hold` | `getInventory()` คืน `[]`, types เป็น `Record<string, never>`, tables/form เป็น placeholder; backend มี balances/movements/adjustments routes แล้ว แต่ frontend ยังไม่มี approved business contract | รอ business decision แล้วจึงทบทวน contract และเปิด navigation |
+| Types and schemas | `Partial` | Products และ Auth มี types/schema จริงแล้ว; feature อื่นหลายส่วนยังใช้ placeholder | สร้าง DTO/types/schema จริงให้ตรง backend contract ของ feature ที่เหลือ |
+| Revalidation after mutation | `Partial` | Product mutations revalidate `/products` และ edit route แล้ว | เพิ่มตาม matrix เมื่อ implement feature mutations ที่เหลือ |
+| Lint/build verification | `Done for current changes` | `npm run lint` และ Next.js production build ผ่านวันที่ `2026-07-14` หลัง product image upload และ Inventory navigation hold | รันซ้ำทุกครั้งก่อนส่งมอบ; ยังต้องทำ browser E2E |
 
-สรุปสถานะตอนนี้: foundation และ auth login integration ฝั่ง frontend พร้อมเป็นฐานแล้ว และ backend route contract ระดับ endpoint/request schema ถูกตรวจรอบล่าสุดแล้ว งานถัดไปคือสรุป response DTO จริงให้ครบ, restart backend port `4000` เพื่อทดสอบ login ผ่าน browser จากนั้นเริ่มเชื่อม Dashboard เป็น feature แรกก่อนขยายไป Products, Transactions, Queue, Loans และ Inventory
+สรุปสถานะตอนนี้: foundation, auth integration และ Products implementation พร้อมเป็นฐานแล้ว งานถัดไปคือทดสอบ auth/Products กับ browser และ backend จริง จากนั้นเชื่อม Dashboard ก่อนขยายไป Transactions, Queue และ Loans ส่วน Inventory อยู่สถานะ `Hold` รอ business decision
 
 ## 2. หลักการดำเนินงาน
 
@@ -114,9 +117,9 @@ MVP frontend ต้องทำให้ Admin สามารถ:
 8. อัปเดตสถานะ `DELIVERY_EXCHANGE`
 9. ดูรายการยืมถังค้าง
 10. คืนถังแบบเต็มจำนวนหรือบางส่วน
-11. ดู stock balance
-12. ดู inventory movement
-13. ปรับยอด stock พร้อม note
+11. ดู stock balance (`Hold` — รอ business decision)
+12. ดู inventory movement (`Hold` — รอ business decision)
+13. ปรับยอด stock พร้อม note (`Hold` — รอ business decision และ permission contract)
 14. เห็น error/loading/empty state ที่เข้าใจง่าย
 
 ## 4. สมมติฐาน API Contract
@@ -158,7 +161,7 @@ type ApiErrorResponse = {
 | --- | --- |
 | Auth | `POST /auth/login`, `GET /auth/me`, logout via frontend route handler |
 | Dashboard | `GET /dashboard/today` |
-| Products | `GET /products`, `POST /products`, `GET /products/:id`, `PATCH /products/:id`, `DELETE /products/:id` |
+| Products | `GET /products`, `POST /products`, `GET /products/:id`, `PATCH /products/:id`, `DELETE /products/:id`, `GET/POST /products/:id/images`, `PATCH/DELETE /products/:id/images/:imageId` |
 | Transactions | `POST /transactions`, `GET /transactions`, `GET /transactions/:id`, `PATCH /transactions/:id/status`, `POST /transactions/:id/cancel` |
 | Queues | `GET /queues/today`, `GET /queues?date=...`, `PATCH /queues/:transactionId/status` |
 | Loans | `GET /loans`, `GET /loans/active`, `GET /loans/:id`, `POST /loans/:id/return` |
@@ -193,8 +196,9 @@ Backend request schema ที่ frontend ต้องยึด:
 | Feature | Query/Body หลัก |
 | --- | --- |
 | Products list | `search?`, `includeInactive`, `page`, `limit` |
-| Products create | `brand`, `weightKg`, `exchangeCostPrice`, `exchangeSalePrice`, `fullTankPrice`, `initialFullQty`, `initialEmptyQty` |
-| Products update | partial ของ create ยกเว้น `initialFullQty`, `initialEmptyQty` |
+| Products create | `brand`, `weightKg`, `exchangeCostPrice`, `exchangeSalePrice`, `fullTankPrice` |
+| Products update | partial ของ product write fields และ `isActive` ตาม operation |
+| Product image upload | `multipart/form-data`: `file` required, `sortOrder?`, `isPrimary?`; ต้องมี `productId` ก่อน upload |
 | Transactions list | `type?`, `status?`, `customerPhone?`, `page`, `limit` |
 | Transactions create | `transactionType`, customer snapshot, `expectedReturnDate?`, `depositAmount`, `items[]` ที่มี `productId`, `quantity`, `itemAction`, `unitPrice?`, `costPrice?`, `note?` |
 | Transaction status | `status`, `note?` |
@@ -280,7 +284,7 @@ Backend request schema ที่ frontend ต้องยึด:
 เกณฑ์ยอมรับ:
 
 1. หน้าที่ต้อง login ใช้ app shell เดียวกัน
-2. Navigation ครอบคลุม Dashboard, Transactions, Queues, Loans, Products และ Inventory
+2. Navigation ครอบคลุม Dashboard, Transactions, Queues, Loans และ Products; Inventory menu ถูกซ่อนระหว่าง `Hold`
 3. UI states สอดคล้องกันทุก feature
 4. Layout ใช้งานได้ทั้ง desktop และ mobile โดยข้อความไม่ทับกัน
 
@@ -427,7 +431,7 @@ Checklist ย่อยสำหรับ login integration:
    - today sales
    - product prices
    - active loans
-   - inventory balances
+   - inventory balances (`Hold` — ยังไม่แสดงจนกว่า business contract จะอนุมัติ)
 3. Implement dashboard page/server fetch
 4. Implement widgets
    - Status summary
@@ -435,12 +439,12 @@ Checklist ย่อยสำหรับ login integration:
    - Today sales
    - Product price list
    - Active loans
-   - Inventory balance
+   - Inventory balance (`Hold`)
 5. เพิ่ม direct actions/links
    - create transaction
    - open queue
    - open active loans
-   - open low stock item if available
+   - open low stock item if available (`Hold`)
 
 เกณฑ์ยอมรับ:
 
@@ -453,32 +457,40 @@ Checklist ย่อยสำหรับ login integration:
 
 เป้าหมาย: Admin จัดการสินค้าแก๊สได้ครบ
 
+สถานะปัจจุบัน: `Implemented, pending browser/API E2E` — implementation และ compile checks พร้อม แต่ยังไม่ถือว่า verified จนกว่าจะทดสอบ mutation กับ authenticated browser และ backend จริง
+
 งานที่ต้องทำ:
 
-1. Implement product types and schema
-2. Implement `product.api.ts`
-   - list
+1. [x] Implement product types and schema ตาม DTO/decimal string contract
+2. [x] Implement `product.api.ts`
+   - list พร้อม pagination meta
    - detail
    - create
-   - update
-   - soft delete
-3. Implement product list page
-   - table
-   - active/inactive filter
-   - search by brand/weight if backend supports
-   - actions
-4. Implement create product form
-5. Implement edit product form
-6. Implement soft delete confirmation
-7. Revalidate `/products` and `/inventory` after mutation
+   - update/reactivate
+   - soft delete/deactivate
+   - product image upload แบบ `multipart/form-data`
+3. [x] Implement product list page
+   - responsive table/mobile rows
+   - active/all filter
+   - search by brand ตาม backend contract
+   - pagination, loading, empty, error และ permission states
+   - edit/activate/deactivate actions
+4. [x] Implement create product form พร้อม validation และ pending/error state
+5. [x] Implement edit product form พร้อมแสดงรูปปัจจุบัน
+6. [x] Implement deactivate/reactivate confirmation
+7. [x] Implement image selection, preview, optional primary flag และ upload หลังได้รับ `productId`
+8. [x] รองรับ partial success: create สำเร็จแต่ upload fail แล้ว retry ด้วย `productId` เดิมโดยไม่สร้างสินค้าซ้ำ
+9. [x] Revalidate `/products` และ `/products/[id]/edit` หลัง mutation; Inventory revalidation พักระหว่าง `Hold`
+10. [ ] ทดสอบ authenticated browser/API E2E กับ backend จริงทั้ง desktop/mobile และ failure cases
 
 เกณฑ์ยอมรับ:
 
-1. Admin เพิ่มสินค้าได้
-2. Admin แก้ราคาสินค้าได้
-3. Admin ปิดใช้งานสินค้าได้
-4. Inactive product ไม่ควรถูกเลือกใน transaction ใหม่
-5. ประวัติเก่ายังแสดง snapshot ได้ตาม backend data
+1. [Implemented, pending E2E] Admin เพิ่มสินค้าและอัปโหลดรูปหนึ่งไฟล์ต่อ request ได้
+2. [Implemented, pending E2E] Admin แก้ข้อมูล/ราคาและดูรูปปัจจุบันได้
+3. [Implemented, pending E2E] Admin ปิดและเปิดใช้งานสินค้าได้
+4. [Backend authority] Inactive product ไม่ถูกเลือกใน transaction ใหม่
+5. [Backend authority] ประวัติเก่ายังแสดง snapshot โดยไม่ถูก master data ล่าสุดเขียนทับ
+6. [Implemented, pending E2E] Upload failure ไม่ทำให้ frontend สร้าง product ซ้ำ และแสดง request ID เมื่อ backend ส่งมา
 
 ## 11. Phase 6: Transactions
 
@@ -566,14 +578,14 @@ Checklist ย่อยสำหรับ login integration:
    - `IN_PROGRESS -> COMPLETED`
    - `IN_PROGRESS -> CANCELLED`
 5. เพิ่ม confirmation for complete/cancel
-6. Revalidate `/queues`, `/dashboard`, `/transactions`, `/inventory`
+6. Revalidate `/queues`, `/dashboard`, `/transactions`; งด `/inventory` ระหว่าง `Hold`
 
 เกณฑ์ยอมรับ:
 
 1. Delivery queue แสดงตาม queue number
 2. Update status ได้ตาม allowed transition
-3. เมื่อ complete แล้ว backend ตัด stock และ frontend refresh stock/dashboard
-4. Cancelled queue ไม่ตัด stock
+3. เมื่อ complete แล้ว backend เป็นผู้ตัด stock; frontend refresh dashboard ส่วน Inventory UI รอหลังยกเลิก `Hold`
+4. Cancelled queue ไม่ตัด stock โดย backend เป็น final authority
 
 ## 13. Phase 8: Loans
 
@@ -603,20 +615,22 @@ Checklist ย่อยสำหรับ login integration:
    - return quantity
    - return note
    - validation against remaining quantity
-6. Revalidate `/loans`, `/dashboard`, `/inventory`, `/transactions`
+6. Revalidate `/loans`, `/dashboard`, `/transactions`; งด `/inventory` ระหว่าง `Hold`
 
 เกณฑ์ยอมรับ:
 
 1. Active loan list แสดงรายการยืมค้าง
 2. คืนบางส่วนได้ถ้า backend รองรับ
 3. คืนครบแล้ว status เป็น returned
-4. Return flow สร้าง transaction history และ inventory movement ผ่าน backend
+4. Return flow สร้าง transaction history และ inventory movement ผ่าน backend; การแสดง Inventory UI รอหลังยกเลิก `Hold`
 
 ## 14. Phase 9: Inventory
 
 เป้าหมาย: Admin เห็น stock ปัจจุบัน ประวัติ movement และปรับยอดได้
 
-งานที่ต้องทำ:
+สถานะปัจจุบัน: `Hold` — ยังไม่ implement หรือเปิด navigation จนกว่าจะได้ข้อสรุป business เรื่องความหมายของยอด stock, จุดเวลาที่เกิด movement, manual adjustment, permission และการแสดงผลที่ต้องการ Routes และ placeholder source เดิมยังคงอยู่เพื่อรองรับงานในอนาคต
+
+งานที่ต้องทำหลังยกเลิก `Hold` และอนุมัติ business contract:
 
 1. Implement inventory types
 2. Implement `inventory.api.ts`
@@ -679,13 +693,13 @@ Checklist ย่อยสำหรับ login integration:
 | --- | --- |
 | Login | `/dashboard` |
 | Logout | `/login` |
-| สร้าง product | `/products`, `/inventory`, `/dashboard` |
-| Update product | `/products`, `/products/[id]/edit`, `/dashboard` |
+| สร้าง product | `/products`; `/inventory` และ `/dashboard` รอ feature/contract ที่เกี่ยวข้อง |
+| Update product/image | `/products`, `/products/[id]/edit`; `/dashboard` รอ dashboard implementation |
 | Soft delete product | `/products`, `/transactions/new` |
-| สร้าง transaction | `/dashboard`, `/transactions`, `/queues`, `/loans`, `/inventory` |
-| Change transaction status | `/dashboard`, `/transactions`, `/queues`, `/inventory` |
-| Return loan | `/dashboard`, `/loans`, `/inventory`, `/transactions` |
-| Adjust inventory | `/inventory`, `/inventory/movements`, `/dashboard` |
+| สร้าง transaction | `/dashboard`, `/transactions`, `/queues`, `/loans`; งด `/inventory` ระหว่าง `Hold` |
+| Change transaction status | `/dashboard`, `/transactions`, `/queues`; งด `/inventory` ระหว่าง `Hold` |
+| Return loan | `/dashboard`, `/loans`, `/transactions`; งด `/inventory` ระหว่าง `Hold` |
+| Adjust inventory | `Hold` — กำหนด route revalidation หลัง business contract ได้รับอนุมัติ |
 
 ## 17. ลำดับ Implement ที่แนะนำ
 
@@ -698,10 +712,10 @@ Checklist ย่อยสำหรับ login integration:
 7. Phase 6: Transactions
 8. Phase 7: Queue
 9. Phase 8: Loans
-10. Phase 9: Inventory
+10. Phase 9: Inventory (`Hold` — ข้ามไว้ก่อนจนกว่า business contract จะได้รับอนุมัติ)
 11. Phase 10: ทำให้ระบบพร้อมใช้งาน
 
-เหตุผลของลำดับนี้คือ auth/API client/app shell เป็น dependency ของทุกหน้า จากนั้น Dashboard และ Products ช่วยเปิดข้อมูลตั้งต้นให้ transaction form ใช้งานได้ แล้วจึงตามด้วย Transactions, Queue, Loans และ Inventory ซึ่งมีผลกระทบต่อกัน
+เหตุผลของลำดับนี้คือ auth/API client/app shell เป็น dependency ของทุกหน้า จากนั้น Dashboard และ Products ช่วยเปิดข้อมูลตั้งต้นให้ transaction form ใช้งานได้ แล้วจึงตามด้วย Transactions, Queue และ Loans ส่วน Inventory แยกไว้ทำภายหลังเมื่อ business contract ได้รับอนุมัติ
 
 ## 18. Checklist เกณฑ์ยอมรับ MVP
 
@@ -713,11 +727,11 @@ Checklist ย่อยสำหรับ login integration:
 | 2 | Admin logout สำเร็จ | `Implemented, pending browser E2E` | `logoutAction()` clear cookie ผ่าน `/api/auth/logout` และ redirect `/login` | ทดสอบกับ browser หลัง login สำเร็จจริง |
 | 3 | ไม่มี session แล้วเข้าหน้า app ไม่ได้ | `Done` | `src/proxy.ts` redirect app routes ไป `/login` เมื่อไม่มี `kmg_session` | เพิ่ม role/permission guard ใน phase ถัดไปถ้าต้องใช้ |
 | 4 | Dashboard แสดงข้อมูลวันนี้ได้ | `Todo` | `getDashboardData()` คืน `null`, widget ว่าง | เชื่อม dashboard API และสร้าง widgets |
-| 5 | Product list/create/edit/soft delete ใช้งานได้ | `Todo` | `getProducts()` คืน `[]`, form/table placeholder | Implement product API wrappers, schema, form, table actions |
+| 5 | Product list/create/edit/activate/deactivate/image upload ใช้งานได้ | `Implemented, pending browser/API E2E` | typed API/schema, server list/search/filter/pagination, responsive table/states, forms/actions และ multipart image Route Handler implement แล้ว; lint/build ผ่าน | ทดสอบ authenticated E2E กับ backend จริง รวม upload failure/retry และ mobile |
 | 6 | Transaction create รองรับสินค้าหลายรายการ | `Todo` | `TransactionForm` เป็น form เปล่า | Implement dynamic item rows และ payload ตาม transaction type |
 | 7 | `DELIVERY_EXCHANGE` สร้าง queue ได้ | `Todo` | ยังไม่มี create transaction จริง | เชื่อม create transaction และแสดง queue number จาก backend |
 | 8 | Queue update status ได้ตาม flow | `Todo` | `QueueBoard` เป็น placeholder | Implement queue API และ status action buttons |
-| 9 | `DELIVERY_EXCHANGE` ที่ complete แล้วทำให้ dashboard/inventory refresh | `Todo` | ยังไม่มี status mutation/revalidation | Implement status mutation และ revalidate `/dashboard`, `/queues`, `/inventory`, `/transactions` |
+| 9 | `DELIVERY_EXCHANGE` ที่ complete แล้วทำให้ dashboard refresh | `Todo` | ยังไม่มี status mutation/revalidation; Inventory UI อยู่ระหว่าง `Hold` | Implement status mutation และ revalidate `/dashboard`, `/queues`, `/transactions`; เพิ่ม `/inventory` หลังยกเลิก `Hold` |
 | 10 | `WALK_IN_EXCHANGE` สร้างรายการสำเร็จ | `Todo` | ยังไม่มี transaction create behavior | เพิ่ม flow ใน transaction form |
 | 11 | `BORROW_CYLINDER` สร้าง loan สำเร็จ | `Todo` | ยังไม่มี transaction create behavior | เพิ่ม borrow fields และ payload |
 | 12 | `RETURN_CYLINDER` คืนถังและอัปเดต loan สำเร็จ | `Todo` | `ReturnLoanDialog` เป็น dialog placeholder | Implement loan selector/return dialog และ backend mutation |
@@ -726,15 +740,15 @@ Checklist ย่อยสำหรับ login integration:
 | 15 | Transaction detail แสดง snapshot และ status log | `Todo` | `TransactionDetail` เป็น placeholder | Implement detail fetch และ UI |
 | 16 | Active loans แสดงรายการค้างคืน | `Todo` | `getLoans()` คืน `[]`, `LoanTable` placeholder | Implement active loans API และ table |
 | 17 | Return loan รองรับคืนบางส่วนหรือคืนครบตาม backend | `Todo` | `ReturnLoanDialog` ยังไม่มี fields/action | Implement return quantity validation และ submit |
-| 18 | Inventory balance แสดงถูกต้อง | `Todo` | `getInventory()` คืน `[]`, `BalanceTable` placeholder | Implement balances API และ table |
-| 19 | Inventory movement แสดงถูกต้อง | `Todo` | `MovementTable` placeholder | Implement movements API, filters และ table |
-| 20 | Inventory adjustment ต้องมี note | `Todo` | `AdjustmentForm` เป็น form เปล่า, schema `{}` | Implement adjustment schema/form และ required note |
+| 18 | Inventory balance แสดงถูกต้อง | `Hold` | `getInventory()` คืน `[]`, `BalanceTable` placeholder และ navigation ถูกซ่อน | รอ approved stock balance contract |
+| 19 | Inventory movement แสดงถูกต้อง | `Hold` | `MovementTable` placeholder และ navigation ถูกซ่อน | รอ approved movement timing/read contract |
+| 20 | Inventory adjustment ต้องมี note | `Hold` | `AdjustmentForm` เป็น form เปล่า, schema `{}` และ navigation ถูกซ่อน | รอ approved adjustment/permission contract |
 | 21 | API error สำคัญแสดงข้อความเข้าใจง่าย | `Partial` | `ApiError` และ `toUserMessage()` map error หลักสำหรับ auth แล้ว | ขยาย mapping ตาม error code จริงของทุก feature |
-| 22 | Loading, empty และ error states ครบในหน้าหลัก | `Todo` | ยังไม่พบ route-level states หรือ feature states จริง | เพิ่ม loading/error/empty states ต่อ route/feature |
-| 23 | Desktop layout ใช้งานสะดวก | `Partial` | มี app shell components แต่ยังว่าง | เติม sidebar/topbar/content layout จริงและตรวจ responsive |
-| 24 | Mobile layout ไม่ทับซ้อนและ action หลักกดได้ | `Partial` | มี `MobileNav` แต่ยังว่าง | เติม mobile nav และทดสอบ viewport |
-| 25 | `npm run lint` ผ่าน | `Done` | รันล่าสุดผ่านหลัง implement login integration | รันซ้ำก่อน merge/ส่งมอบครั้งถัดไป |
-| 26 | `npm run build` ผ่าน | `Done` | รันล่าสุดผ่านหลังใช้ Next.js 16 `proxy` และ font fallback | รันซ้ำเมื่อเพิ่ม feature ใหม่ |
+| 22 | Loading, empty และ error states ครบในหน้าหลัก | `Partial` | Products มี route/feature loading, empty, error และ permission states แล้ว; feature อื่นยังไม่ครบ | เพิ่ม states ให้ feature ที่เหลือ |
+| 23 | Desktop layout ใช้งานสะดวก | `Partial` | app shell/navigation และ Products desktop layout implement แล้ว | ทำ authenticated browser QA และเติม feature อื่น |
+| 24 | Mobile layout ไม่ทับซ้อนและ action หลักกดได้ | `Partial` | `MobileNav` และ Products responsive rows/form implement แล้ว | ทำ authenticated mobile viewport QA และเติม feature อื่น |
+| 25 | `npm run lint` ผ่าน | `Done` | รันผ่านล่าสุดวันที่ `2026-07-14` หลัง product image upload และ Inventory menu hold | รันซ้ำก่อน merge/ส่งมอบครั้งถัดไป |
+| 26 | `npm run build` ผ่าน | `Done` | Next.js 16 production build ผ่านล่าสุดวันที่ `2026-07-14`; image Route Handler compile สำเร็จ | รันซ้ำเมื่อเพิ่ม feature ใหม่ |
 
 ## 19. ความเสี่ยงและวิธีลดความเสี่ยง
 
