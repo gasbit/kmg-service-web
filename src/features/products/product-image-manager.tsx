@@ -19,6 +19,10 @@ function sortImages(images: ProductImage[]) {
   return [...images].sort((left, right) => left.sortOrder - right.sortOrder || left.id.localeCompare(right.id, undefined, { numeric: true }));
 }
 
+function displaySortOrder(sortOrder: number) {
+  return String(sortOrder + 1);
+}
+
 async function imageRequest<T>(url: string, init: RequestInit): Promise<ImageResponse<T>> {
   try {
     const response = await fetch(url, init);
@@ -34,7 +38,7 @@ export function ProductImageManager({ product }: { product: Product }) {
   const router = useRouter();
   const { toast } = useToast();
   const [images, setImages] = useState(() => sortImages(product.images));
-  const [sortOrders, setSortOrders] = useState<Record<string, string>>(() => Object.fromEntries(product.images.map((image) => [image.id, String(image.sortOrder)])));
+  const [sortOrders, setSortOrders] = useState<Record<string, string>>(() => Object.fromEntries(product.images.map((image) => [image.id, displaySortOrder(image.sortOrder)])));
   const [sortErrors, setSortErrors] = useState<Record<string, string>>({});
   const [pendingAction, setPendingAction] = useState<{ imageId: string; label: string } | null>(null);
   const [deleteCandidate, setDeleteCandidate] = useState<ProductImage | null>(null);
@@ -46,7 +50,7 @@ export function ProductImageManager({ product }: { product: Product }) {
       if (image.id === updated.id) return updated;
       return updated.isPrimary ? { ...image, isPrimary: false } : image;
     })));
-    setSortOrders((current) => ({ ...current, [updated.id]: String(updated.sortOrder) }));
+    setSortOrders((current) => ({ ...current, [updated.id]: displaySortOrder(updated.sortOrder) }));
     router.refresh();
   }
 
@@ -68,16 +72,16 @@ export function ProductImageManager({ product }: { product: Product }) {
 
   async function saveSortOrder(image: ProductImage) {
     const rawValue = sortOrders[image.id]?.trim() ?? "";
-    const value = Number(rawValue);
-    if (!rawValue || !Number.isInteger(value) || value < 0) {
-      setSortErrors((current) => ({ ...current, [image.id]: "ลำดับต้องเป็นจำนวนเต็มตั้งแต่ 0" }));
+    const displayValue = Number(rawValue);
+    if (!rawValue || !Number.isInteger(displayValue) || displayValue < 1) {
+      setSortErrors((current) => ({ ...current, [image.id]: "ลำดับต้องเป็นจำนวนเต็มตั้งแต่ 1" }));
       return;
     }
 
     setSortErrors((current) => ({ ...current, [image.id]: "" }));
     setPendingAction({ imageId: image.id, label: "กำลังบันทึกลำดับรูป" });
     const result = await imageRequest<ProductImage>(`/api/products/${product.id}/images/${image.id}`, {
-      body: JSON.stringify({ sortOrder: value }),
+      body: JSON.stringify({ sortOrder: displayValue - 1 }),
       headers: { "Content-Type": "application/json" },
       method: "PATCH",
     });
@@ -125,18 +129,20 @@ export function ProductImageManager({ product }: { product: Product }) {
       <p aria-live="polite" className="sr-only">{pendingAction?.label ?? ""}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {images.map((image) => {
-          const sortChanged = sortOrders[image.id] !== String(image.sortOrder);
+          const sortChanged = sortOrders[image.id] !== displaySortOrder(image.sortOrder);
           const imagePending = pendingAction?.imageId === image.id;
           const sortError = sortErrors[image.id];
           return (
             <article className="overflow-hidden rounded-xl border border-slate-200 bg-white" key={image.id}>
               <div className="relative aspect-[4/3] bg-slate-50">
-                <ProductImageView alt={`รูปสินค้า ${product.brand} ${product.weightKg} กิโลกรัม`} className="absolute inset-3 rounded-lg" image={image} />
+                <div className="absolute inset-3">
+                  <ProductImageView alt={`รูปสินค้า ${product.brand} ${product.weightKg} กิโลกรัม`} className="size-full rounded-lg" image={image} />
+                </div>
                 {image.isPrimary ? <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm"><CheckCircleIcon className="size-3.5" />รูปหลัก</span> : null}
               </div>
               <div className="space-y-3 p-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-slate-600" htmlFor={`product-image-sort-${image.id}`}>ลำดับรูป</label>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-600" htmlFor={`product-image-sort-${image.id}`}>ลำดับรูป (เริ่มที่ 1)</label>
                   <div className="flex gap-2">
                     <Input
                       aria-describedby={sortError ? `product-image-sort-${image.id}-error` : undefined}
@@ -145,7 +151,7 @@ export function ProductImageManager({ product }: { product: Product }) {
                       id={`product-image-sort-${image.id}`}
                       inputClassName="text-center"
                       inputMode="numeric"
-                      min={0}
+                      min={1}
                       onChange={(event) => setSortOrders((current) => ({ ...current, [image.id]: event.target.value }))}
                       step={1}
                       type="number"

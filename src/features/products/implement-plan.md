@@ -4,13 +4,13 @@
 
 ## สถานะโดยรวม
 
-- สถานะ: `Implemented, pending completion and E2E verification`
+- สถานะ: `Implementation complete, pending automated/manual verification`
 - Owning route: `src/app/(app)/products`
 - Owning feature: `src/features/products`
 - ผู้ใช้ใน MVP: `ADMIN`
 - Backend เป็น source of truth สำหรับ authentication, authorization, validation, soft delete, image policy และผลกระทบต่อ transaction/inventory
 
-Module นี้มี flow หลักสำหรับ list, search, filter, pagination, create, edit, activate/deactivate และ upload รูปแล้ว แต่ยังขาด image management บางส่วน, accessibility ของ dialog/upload feedback, success toast และการทดสอบ browser/API E2E
+Module นี้ implement flow หลักสำหรับ list, search, filter, pagination, create, edit, activate/deactivate, image management, loading/error feedback, responsive และ accessibility แล้ว เหลือ automated tests, authenticated browser/API E2E, manual keyboard/screen-reader QA และ presentation permission guard เมื่อ backend มี permission DTO
 
 ## เป้าหมายของ Module
 
@@ -148,15 +148,17 @@ Legend:
 - [x] Create สำเร็จก่อนแล้วจึง upload ด้วย `productId`
 - [x] หาก upload หลัง create ล้มเหลว สามารถ submit ซ้ำด้วย `productId` เดิมโดยไม่สร้าง product ซ้ำ
 - [x] หน้า edit แสดง current images และสถานะรูปหลัก
+- [x] Current image ใช้ container ที่มีขนาดแน่นอน และแสดง fallback เฉพาะรูปเมื่อ URL โหลดไม่ได้โดยไม่ทำให้ image card พัง
 - [x] หน้า edit สามารถ upload รูปเพิ่มและกำหนดรูปที่ upload เป็น primary ได้
 - [x] ตั้งรูปเดิมให้เป็น primary ผ่าน secure frontend Route Handler และ image `PATCH`
 - [x] แก้ `sortOrder` ของรูปเดิมผ่าน image `PATCH` พร้อม validation และเรียงผลล่าสุด
+- [x] ลำดับรูปใน UI เริ่มที่ 1 เพื่อให้ผู้ใช้เข้าใจง่าย และแปลงกลับเป็น backend `sortOrder` แบบเริ่มที่ 0 ก่อนส่ง `PATCH`
 - [x] ลบรูปเดิมผ่าน image `DELETE` พร้อม confirmation และแจ้งชัดเจนว่า backend ไม่เลือก primary ใหม่อัตโนมัติ
 - [x] มี feature API wrappers สำหรับ list/upload/update/delete image ครบ contract
 - [x] ตรวจ JPEG/PNG/WebP, ไฟล์ว่าง, ขนาดไม่เกิน 5 MB และจำนวนสูงสุด 10 รูปก่อน upload โดย backend ยังเป็น final authority
 - [x] Upload/image mutations มี `aria-busy`, `aria-live`, pending control และ global Toast สำหรับ success/failure/request ID
 
-หลักฐานหลัก: `product-form.tsx`, `src/components/ui/file-picker.tsx`, `src/app/api/products/[productId]/images/route.ts`, `product.api.ts`
+หลักฐานหลัก: `product-form.tsx`, `product-image.tsx`, `product-image-manager.tsx`, `product-image.schema.ts`, `src/components/ui/file-picker.tsx`, `src/app/api/products/[productId]/images/route.ts`, `src/app/api/products/[productId]/images/[imageId]/route.ts`, `product.api.ts`
 
 ### 6. Loading, error และ feedback states
 
@@ -192,9 +194,11 @@ Legend:
 - [x] Loading skeleton ใช้ responsive stack/width บน mobile และเปลี่ยนเป็น row/grid ตาม breakpoint โดยไม่ใช้ fixed width บนจอเล็ก
 - [ ] ทำ manual keyboard และ screen-reader smoke test
 
-หลักฐานหลัก: `product-table.tsx`, `product-toolbar.tsx`, `product-form.tsx`, `src/components/ui/dialog.tsx`
+หลักฐานหลัก: `product-table.tsx`, `product-toolbar.tsx`, `product-pagination.tsx`, `product-form.tsx`, `src/app/(app)/products/page.tsx`, `src/app/(app)/products/loading.tsx`, `src/components/ui/dialog.tsx`
 
 ### 8. Permission และ business boundaries
+
+สถานะ: `Done for ADMIN MVP`; presentation guard ราย action รอ backend permission DTO และไม่ใช่ blocker ของ MVP ปัจจุบัน
 
 - [x] ไม่เก็บ access token ใน localStorage/sessionStorage/client-readable cookie
 - [x] Backend ตรวจ authorization ของ read/mutation และ frontend รองรับ 401/403
@@ -224,22 +228,20 @@ Legend:
 
 ## ลำดับงานที่แนะนำ
 
-1. ปิด image management contract: list/update primary/update sort/delete พร้อม UI และ confirmation
-2. ปรับ shared `Dialog` ให้ผ่าน keyboard/focus accessibility
-3. ทำ Toast/feedback flow ให้ success และ error คงอยู่ข้าม navigation ตามที่จำเป็น
-4. เติม upload accessibility และ network/offline error mapping
-5. เพิ่ม focused unit/component tests
-6. ทดสอบ authenticated browser/API E2E ทุก critical flow และ responsive viewport
-7. รัน lint/build แล้วอัปเดต checklist ตามผล verification
+1. เพิ่ม focused unit/component tests สำหรับ validation, form, toolbar, pagination, dialog และ image manager
+2. ทดสอบ authenticated browser/API E2E ทุก critical flow รวม success, failure, partial-success และ network states
+3. ทำ manual keyboard/screen-reader QA และตรวจ responsive viewport desktop/tablet/mobile
+4. เพิ่ม presentation permission guard เมื่อ backend ส่ง permission DTO ราย action
+5. รัน lint/build หลัง test/fix รอบถัดไปและอัปเดตผล verification
 
 ## เกณฑ์ปิด Module
 
 ถือว่า Products module พร้อมเมื่อ:
 
 - [ ] Critical acceptance criteria ใน `products-screen-spec.md` ผ่านครบ
-- [ ] Image management ที่อยู่ใน scope ทำได้ครบโดย backend เป็น authority
+- [x] Image management ที่อยู่ใน scope ทำได้ครบโดย backend เป็น authority
 - [ ] Dialog, upload และ mutation feedback ผ่าน keyboard/accessibility QA
 - [ ] Authenticated browser/API E2E ผ่านทั้ง success, failure และ partial-success flows
 - [ ] Desktop, tablet และ mobile ใช้งาน flow หลักได้โดย layout ไม่แตก
-- [ ] `npm run lint` ผ่าน
-- [ ] `npm run build` ผ่านสำหรับ code revision ล่าสุด
+- [x] `npm run lint` ผ่านสำหรับ code revision ล่าสุดวันที่ `2026-07-14`
+- [x] `npm run build` ผ่านสำหรับ code revision ล่าสุดวันที่ `2026-07-14`

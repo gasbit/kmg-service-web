@@ -212,7 +212,7 @@
 | ราคาถังเต็ม | decimal | เหมือนด้านบน | backend authority | เหมือนด้านบน |
 | เปิดใช้งาน | switch/checkbox (edit only) | ไม่ส่งใน create | optional boolean ใน PATCH | “ไม่สามารถเปลี่ยนสถานะได้” |
 | รูปสินค้า | file input (`accept="image/*"`) | เลือกหนึ่งไฟล์ต่อ upload, แสดงชื่อ/preview และอนุญาตเอาออกก่อนส่ง; `accept` เป็นเพียงคำแนะนำ | backend ตรวจ MIME type, file signature, extension, file size และจำนวนรูปตาม policy | “ไฟล์รูปไม่ถูกต้องหรือไม่เป็นไปตามข้อกำหนด กรุณาเลือกไฟล์ใหม่” และแสดง backend message ที่ปลอดภัยเมื่อมี |
-| ลำดับรูป | number (เมื่อเปิดให้แก้) | integer ≥0 | integer ≥0; default 0 | “ลำดับรูปต้องเป็นจำนวนเต็มตั้งแต่ 0” |
+| ลำดับรูป | number (เมื่อเปิดให้แก้) | integer ≥1 ใน UI | แสดง `sortOrder + 1` และส่งกลับเป็น `ค่าที่กรอก - 1`; backend default 0 | “ลำดับรูปต้องเป็นจำนวนเต็มตั้งแต่ 1” |
 | รูปหลัก | checkbox/switch | ส่ง `true` เมื่อต้องการให้รูปที่อัปโหลด/เลือกเป็นรูปหลัก | backend รักษา primary ได้เพียงหนึ่งรูปแบบ atomic | “ไม่สามารถกำหนดรูปหลักได้” |
 
 Frontend validation เป็น assistive เท่านั้น ต้องแสดง validation/error จาก backend และห้าม derive price/stock business rules เพิ่มเอง
