@@ -13,6 +13,7 @@ export function ProductToolbar({ initialSearch = "" }: { initialSearch?: string 
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchDraft, setSearchDraft] = useState(() => ({ source: initialSearch, value: initialSearch }));
+  const [querying, startQuery] = useTransition();
   const [refreshing, startRefresh] = useTransition();
   const searchFromUrl = searchParams.get("search")?.trim() ?? "";
   const includeInactive = searchParams.get("includeInactive") === "true";
@@ -23,8 +24,10 @@ export function ProductToolbar({ initialSearch = "" }: { initialSearch?: string 
     Object.entries(values).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key));
     next.set("page", "1");
     const href = `${pathname}?${next.toString()}`;
-    if (history === "push") router.push(href, { scroll: false });
-    else router.replace(href, { scroll: false });
+    startQuery(() => {
+      if (history === "push") router.push(href, { scroll: false });
+      else router.replace(href, { scroll: false });
+    });
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
@@ -36,7 +39,8 @@ export function ProductToolbar({ initialSearch = "" }: { initialSearch?: string 
   }, [search, searchFromUrl, updateQuery]);
 
   return (
-    <div className="flex flex-col gap-4 xl:flex-row xl:items-end">
+    <div aria-busy={querying || undefined} className="flex flex-col gap-4 xl:flex-row xl:items-end">
+      <span aria-live="polite" className="sr-only" role="status">{querying ? "กำลังอัปเดตผลลัพธ์สินค้า" : ""}</span>
       <form className="min-w-0 flex-1" onSubmit={(event) => { event.preventDefault(); updateQuery({ search: search.trim() || null }); }} role="search">
         <label className="mb-2 block text-xs font-semibold text-slate-600" htmlFor="product-search">ค้นหาสินค้า</label>
         <Input id="product-search" leftIcon={<SearchIcon className="size-5" />} maxLength={100} onChange={(event) => setSearchDraft({ source: searchFromUrl, value: event.target.value })} placeholder="ค้นหาจากยี่ห้อสินค้า" value={search} wrapperClassName="h-12" />

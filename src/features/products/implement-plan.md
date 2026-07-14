@@ -177,6 +177,8 @@ Legend:
 
 ### 7. Responsive และ accessibility
 
+สถานะ: implementation `Done`; เหลือ authenticated manual keyboard/screen-reader QA ในหมวด verification
+
 - [x] Desktop ใช้ table และรองรับ horizontal overflow
 - [x] Mobile ใช้ stacked product rows ไม่บังคับ scroll table หลายคอลัมน์
 - [x] Toolbar stack บนจอเล็กและ CTA เพิ่มสินค้ายังเห็นชัด
@@ -184,10 +186,10 @@ Legend:
 - [x] Table มี caption และ icon actions มี accessible name
 - [x] Status badge มีข้อความ ไม่สื่อด้วยสีอย่างเดียว
 - [x] Form inputs และ file input มี label
-- [ ] ทำ confirmation dialog ให้รองรับ Escape, focus trap, initial focus และคืน focus ไป trigger; shared `Dialog` ปัจจุบันยังไม่มี behavior เหล่านี้
-- [ ] ใช้ unique dialog title/description IDs เพื่อป้องกัน ID ชนเมื่อมี dialog มากกว่าหนึ่งตัว
-- [ ] ตรวจ focus หลังเปลี่ยน page/filter และประกาศผลลัพธ์ที่เปลี่ยนให้ screen reader
-- [ ] ตรวจ loading skeleton บน mobile/tablet ว่าไม่ overflow
+- [x] Confirmation dialog รองรับ Escape, backdrop dismiss, focus trap, initial focus ที่ cancel และคืน focus ไป trigger; ระหว่าง mutation จะปิด dialog ไม่ได้
+- [x] ใช้ `useId` สร้าง unique dialog title/description IDs ป้องกัน ID ชนเมื่อมี dialog มากกว่าหนึ่งตัว
+- [x] Filter/search รักษา focus ที่ control และประกาศ pending/จำนวนผลลัพธ์; pagination/page size ส่ง focus ไป `#product-results`
+- [x] Loading skeleton ใช้ responsive stack/width บน mobile และเปลี่ยนเป็น row/grid ตาม breakpoint โดยไม่ใช้ fixed width บนจอเล็ก
 - [ ] ทำ manual keyboard และ screen-reader smoke test
 
 หลักฐานหลัก: `product-table.tsx`, `product-toolbar.tsx`, `product-form.tsx`, `src/components/ui/dialog.tsx`

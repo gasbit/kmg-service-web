@@ -168,7 +168,9 @@ export function ProductImageManager({ product }: { product: Product }) {
 
       <Dialog
         description={deleteCandidate ? <>รูปนี้จะถูกลบออกจากสินค้าและ storage หากเป็นรูปหลัก ระบบจะไม่เลือกรูปหลักใหม่ให้อัตโนมัติ</> : null}
-        footer={<><Button disabled={busy} onClick={() => setDeleteCandidate(null)} variant="secondary">ยกเลิก</Button><Button className="bg-red-600 shadow-none hover:bg-red-700 hover:shadow-none" isLoading={busy} loadingText="กำลังลบ" onClick={confirmDelete}>ยืนยันลบรูป</Button></>}
+        dismissible={!busy}
+        footer={<><Button data-dialog-initial-focus disabled={busy} onClick={() => setDeleteCandidate(null)} variant="secondary">ยกเลิก</Button><Button className="bg-red-600 shadow-none hover:bg-red-700 hover:shadow-none" isLoading={busy} loadingText="กำลังลบ" onClick={confirmDelete}>ยืนยันลบรูป</Button></>}
+        onOpenChange={(nextOpen) => { if (!nextOpen && !busy) setDeleteCandidate(null); }}
         open={Boolean(deleteCandidate)}
         title="ลบรูปสินค้านี้?"
       />
