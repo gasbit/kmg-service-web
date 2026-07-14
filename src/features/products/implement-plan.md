@@ -84,6 +84,8 @@ Legend:
 
 ### 2. List, search, filter และ pagination
 
+สถานะ: `Done` จาก source, lint และ production build; browser/API E2E รวมอยู่ในหมวด verification
+
 - [x] แสดง primary image ก่อน, fallback เป็นรูปแรก และใช้ placeholder เมื่อไม่มีรูป
 - [x] แสดง brand, weight, exchange cost, exchange sale price, full tank price, active status และ updated time
 - [x] Format ราคา 2 ตำแหน่งและ format วันเวลาตาม `Asia/Bangkok`
@@ -94,12 +96,14 @@ Legend:
 - [x] Pagination แสดง range, previous/next, current page และ page size 10/20/50/100
 - [x] Summary ใช้ข้อมูลจริงจาก pagination และข้อมูลในหน้าปัจจุบัน ไม่สร้าง stock/category metrics ปลอม
 - [x] มี empty database และ empty filtered states พร้อม CTA ที่เกี่ยวข้อง
-- [ ] ตรวจ browser behavior ของ back/forward ว่า search input sync กับ URL ทุกกรณี
-- [ ] ตรวจ pagination edge cases เมื่อ URL ขอหน้าที่มากกว่า `totalPages`
+- [x] Search และ status filter ใช้ URL เป็น source of truth จึง sync เมื่อ client navigation หรือ browser back/forward เปลี่ยน query
+- [x] Normalize `page`/`limit` ที่ไม่ถูกต้อง และ redirect page ที่เกิน `totalPages` ไปหน้าสุดท้ายโดยรักษา search/filter/page size
 
 หลักฐานหลัก: `product-toolbar.tsx`, `product-table.tsx`, `product-pagination.tsx`, `src/app/(app)/products/page.tsx`
 
 ### 3. Create และ edit product
+
+สถานะ: `Done` จาก source, lint และ production build; browser/API E2E รวมอยู่ในหมวด verification
 
 - [x] มีฟอร์ม create/edit ที่ reuse component เดียวกัน
 - [x] รองรับ `brand`, `weightKg`, `exchangeCostPrice`, `exchangeSalePrice`, `fullTankPrice`
@@ -110,8 +114,8 @@ Legend:
 - [x] ป้องกัน submit ซ้ำด้วย pending/loading state
 - [x] ใช้ Server Action สำหรับ create/update และ revalidate product list/edit path
 - [x] หน้า edit preload product จาก backend
-- [ ] Map backend validation details กลับไปยัง field ที่เกี่ยวข้อง; ปัจจุบันแสดงข้อความรวมสำหรับ backend `VALIDATION_ERROR`
-- [ ] เพิ่ม unsaved-changes warning ก่อนออกจากฟอร์มตาม form UX ใน architecture
+- [x] Map backend Zod issue path จาก `VALIDATION_ERROR.details` กลับเป็นข้อความไทยใต้ field ที่เกี่ยวข้องโดยไม่เปิดเผย internal message
+- [x] เตือนเมื่อมีข้อมูลยังไม่บันทึกก่อน reload/ปิดแท็บหรือกด internal link และปิด guard ก่อน redirect หลังบันทึกสำเร็จ
 
 หลักฐานหลัก: `product-form.tsx`, `product.schema.ts`, `actions.ts`, `product.types.ts`
 

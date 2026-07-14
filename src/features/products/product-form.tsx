@@ -11,6 +11,7 @@ import { saveProductAction } from "./actions";
 import type { Product, ProductActionState, ProductImage, ProductWriteInput } from "./product.types";
 
 const initialState: ProductActionState = { ok: false, message: "" };
+const unsavedChangesMessage = "มีข้อมูลสินค้าที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?";
 
 type UploadResponse =
   | { success: true; data: ProductImage }
@@ -45,6 +46,7 @@ function ExistingImages({ images, product }: { images: ProductImage[]; product: 
 
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
+  const dirtyRef = useRef(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -52,6 +54,60 @@ export function ProductForm({ product }: { product?: Product }) {
 
   useEffect(() => {
     return () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); };
+  }, []);
+
+  useEffect(() => {
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      if (!dirtyRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    function handleDocumentClick(event: MouseEvent) {
+      if (!dirtyRef.current || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement) || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+
+      const destination = new URL(anchor.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+      if (`${destination.pathname}${destination.search}${destination.hash}` === `${window.location.pathname}${window.location.search}${window.location.hash}`) return;
+      if (window.confirm(unsavedChangesMessage)) {
+        dirtyRef.current = false;
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    function handleNavigate(event: Event) {
+      if (!dirtyRef.current || !event.cancelable) return;
+      const destinationUrl = (event as Event & { destination?: { url?: string } }).destination?.url;
+      if (destinationUrl && destinationUrl === window.location.href) return;
+      if (window.confirm(unsavedChangesMessage)) {
+        dirtyRef.current = false;
+        return;
+      }
+      event.preventDefault();
+    }
+
+    const navigation = (window as Window & {
+      navigation?: {
+        addEventListener: (type: string, listener: EventListener) => void;
+        removeEventListener: (type: string, listener: EventListener) => void;
+      };
+    }).navigation;
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("click", handleDocumentClick, true);
+    navigation?.addEventListener("navigate", handleNavigate);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", handleDocumentClick, true);
+      navigation?.removeEventListener("navigate", handleNavigate);
+    };
   }, []);
 
   function handleFileChange(file: File | null) {
@@ -93,11 +149,15 @@ export function ProductForm({ product }: { product?: Product }) {
   const [state, formAction, pending] = useActionState(submitProduct, initialState);
 
   useEffect(() => {
-    if (state.ok) { router.push("/products"); router.refresh(); }
+    if (state.ok) {
+      dirtyRef.current = false;
+      router.push("/products");
+      router.refresh();
+    }
   }, [router, state.ok]);
 
   return (
-    <form action={formAction} aria-label={product ? "แก้ไขสินค้า" : "เพิ่มสินค้า"} className="mx-auto max-w-4xl">
+    <form action={formAction} aria-label={product ? "แก้ไขสินค้า" : "เพิ่มสินค้า"} className="mx-auto max-w-4xl" onChange={() => { dirtyRef.current = true; }}>
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-5 sm:px-7"><h2 className="text-lg font-bold text-[#071a43]">ข้อมูลสินค้า</h2><p className="mt-1 text-sm text-slate-500">กรอกข้อมูลราคาเป็นบาท ระบบจะใช้ค่าล่าสุดกับรายการใหม่เท่านั้น</p></div>
         <div className="grid gap-5 p-5 sm:grid-cols-2 sm:p-7">

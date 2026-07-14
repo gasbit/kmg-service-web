@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ApiError, toUserMessage } from "@/lib/api/errors";
 import { createProduct, deactivateProduct, updateProduct } from "./product.api";
-import { validateProductInput } from "./product.schema";
+import { mapProductApiFieldErrors, validateProductInput } from "./product.schema";
 import type { ProductActionState } from "./product.types";
 
 const initialFailure = (message: string): ProductActionState => ({ ok: false, message });
@@ -19,7 +19,18 @@ export async function saveProductAction(id: string | null, previous: ProductActi
     revalidatePath(`/products/${product.id}/edit`);
     return { ok: true, message: "บันทึกข้อมูลสินค้าแล้ว", productId: product.id, productSaved: true };
   } catch (error) {
-    if (error instanceof ApiError) return { ok: false, message: toUserMessage(error.code, error.message), productId: productId ?? undefined, productSaved, requestId: error.requestId };
+    if (error instanceof ApiError) {
+      const fieldErrors = error.code === "VALIDATION_ERROR" ? mapProductApiFieldErrors(error.details) : undefined;
+      const hasFieldErrors = fieldErrors && Object.keys(fieldErrors).length > 0;
+      return {
+        ok: false,
+        message: hasFieldErrors ? "กรุณาตรวจสอบข้อมูลที่กรอก" : toUserMessage(error.code, error.message),
+        fieldErrors: hasFieldErrors ? fieldErrors : undefined,
+        productId: productId ?? undefined,
+        productSaved,
+        requestId: error.requestId,
+      };
+    }
     return { ...initialFailure("บันทึกข้อมูลสินค้าไม่สำเร็จ กรุณาลองอีกครั้ง"), productId: productId ?? undefined, productSaved };
   }
 }
