@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { PageHeader } from "@/components/app-shell/page-header";
-import { ApiError } from "@/lib/api/errors";
+import { ApiError, NETWORK_ERROR_CODE, toUserMessage } from "@/lib/api/errors";
 import { getProduct } from "@/features/products/product.api";
 import { ProductForm } from "@/features/products/product-form";
 import { ProductLoadError } from "@/features/products/product-load-error";
@@ -23,6 +23,16 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           <PageHeader description="แก้ไขข้อมูลและราคาสินค้า" title="แก้ไขสินค้า" />
           <div className="p-4 sm:p-6 lg:p-8 lg:pt-4">
             <ProductLoadError forbidden requestId={error.requestId} />
+          </div>
+        </main>
+      );
+    }
+    if (error instanceof ApiError && error.code === NETWORK_ERROR_CODE) {
+      return (
+        <main>
+          <PageHeader description="แก้ไขข้อมูลและราคาสินค้า" title="แก้ไขสินค้า" />
+          <div className="p-4 sm:p-6 lg:p-8 lg:pt-4">
+            <ProductLoadError message={toUserMessage(error.code)} />
           </div>
         </main>
       );

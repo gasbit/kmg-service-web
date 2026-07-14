@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeftIcon, CheckCircleIcon, ImageIcon } from "@/components/icon/icons";
+import { ArrowLeftIcon } from "@/components/icon/icons";
 import { Button } from "@/components/ui/button";
 import { FilePicker } from "@/components/ui/file-picker";
 import { Checkbox, Input } from "@/components/ui/input";
+import { useToast } from "@/lib/hooks/use-toast";
+import { NETWORK_ERROR_MESSAGE } from "@/lib/api/errors";
 import { saveProductAction } from "./actions";
+import { ProductImageManager } from "./product-image-manager";
+import { PRODUCT_IMAGE_ACCEPT, validateProductImageFile } from "./product-image.schema";
 import type { Product, ProductActionState, ProductImage, ProductWriteInput } from "./product.types";
 
 const initialState: ProductActionState = { ok: false, message: "" };
@@ -21,33 +25,12 @@ function Field({ error, label, name, defaultValue, placeholder, type = "text" }:
   return <div><label className="mb-2 block text-sm font-semibold text-slate-700" htmlFor={name}>{label}</label><Input aria-describedby={error ? `${name}-error` : undefined} aria-invalid={Boolean(error)} defaultValue={defaultValue} id={name} inputMode={type === "number" ? "decimal" : undefined} name={name} placeholder={placeholder} required step={type === "number" ? "0.01" : undefined} type={type} wrapperClassName={`h-12 ${error ? "border-red-400 focus-within:border-red-500 focus-within:ring-red-100" : ""}`} />{error ? <p className="mt-1.5 text-xs font-medium text-red-600" id={`${name}-error`}>{error}</p> : null}</div>;
 }
 
-function ExistingImages({ images, product }: { images: ProductImage[]; product: Product }) {
-  if (!images.length) return null;
-  return (
-    <div className="mt-5 border-t border-slate-100 pt-5">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div><h3 className="text-sm font-bold text-[#071a43]">รูปที่ใช้อยู่</h3><p className="mt-1 text-xs text-slate-500">รูปหลักจะแสดงในรายการสินค้า หากไม่มีรูปหลักระบบจะแสดงรูปแรก</p></div>
-        <span className="text-xs font-semibold text-slate-500">{images.length.toLocaleString("th-TH")} รูป</span>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {images.map((image) => (
-          <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-2" key={image.id}>
-            <span aria-label={`รูปสินค้า ${product.brand} ${product.weightKg} กิโลกรัม`} className="block aspect-square rounded-lg bg-slate-50 bg-contain bg-center bg-no-repeat" role="img" style={{ backgroundImage: `url(${JSON.stringify(image.url)})` }} />
-            <div className="mt-2 flex min-w-0 items-center gap-1.5">
-              {image.isPrimary ? <CheckCircleIcon className="size-3.5 shrink-0 text-emerald-600" /> : <ImageIcon className="size-3.5 shrink-0 text-slate-400" />}
-              <span className={`truncate text-xs font-semibold ${image.isPrimary ? "text-emerald-700" : "text-slate-500"}`}>{image.isPrimary ? "รูปหลัก" : `ลำดับ ${image.sortOrder}`}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
+  const { toast } = useToast();
   const dirtyRef = useRef(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const [isPrimary, setIsPrimary] = useState(() => !product?.images.some((image) => image.isPrimary));
@@ -112,13 +95,16 @@ export function ProductForm({ product }: { product?: Product }) {
 
   function handleFileChange(file: File | null) {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-    const nextPreviewUrl = file ? URL.createObjectURL(file) : null;
+    const nextError = file ? validateProductImageFile(file, product?.images.length ?? 0) : undefined;
+    const nextPreviewUrl = file && !nextError ? URL.createObjectURL(file) : null;
     previewUrlRef.current = nextPreviewUrl;
     setPreviewUrl(nextPreviewUrl);
     setSelectedFile(file);
+    setFileError(nextError);
   }
 
   const submitProduct = useCallback(async (previous: ProductActionState, formData: FormData): Promise<ProductActionState> => {
+    if (selectedFile && fileError) return { ...previous, ok: false, message: "กรุณาตรวจสอบไฟล์รูปสินค้า" };
     const saved = await saveProductAction(product?.id ?? null, previous, formData);
     if (!saved.ok || !saved.productId || !selectedFile) return saved;
 
@@ -142,19 +128,20 @@ export function ProductForm({ product }: { product?: Product }) {
       }
       return { ...saved, message: "บันทึกข้อมูลและอัปโหลดรูปสินค้าแล้ว" };
     } catch {
-      return { ...saved, imageUploadFailed: true, message: "บันทึกสินค้าแล้ว แต่อัปโหลดรูปไม่สำเร็จ กรุณาลองอีกครั้ง", ok: false, productSaved: true };
+      return { ...saved, imageUploadFailed: true, message: `บันทึกสินค้าแล้ว แต่${NETWORK_ERROR_MESSAGE}`, ok: false, productSaved: true };
     }
-  }, [isPrimary, product?.id, product?.images.length, selectedFile]);
+  }, [fileError, isPrimary, product?.id, product?.images.length, selectedFile]);
 
   const [state, formAction, pending] = useActionState(submitProduct, initialState);
 
   useEffect(() => {
     if (state.ok) {
       dirtyRef.current = false;
+      toast({ title: state.message, variant: "success" });
       router.push("/products");
       router.refresh();
     }
-  }, [router, state.ok]);
+  }, [router, state.message, state.ok, toast]);
 
   return (
     <form action={formAction} aria-label={product ? "แก้ไขสินค้า" : "เพิ่มสินค้า"} className="mx-auto max-w-4xl" onChange={() => { dirtyRef.current = true; }}>
@@ -168,12 +155,14 @@ export function ProductForm({ product }: { product?: Product }) {
           <Field defaultValue={product?.fullTankPrice} error={state.fieldErrors?.fullTankPrice} label="ราคาถังเต็ม (บาท)" name="fullTankPrice" placeholder="2450.00" type="number" />
         </div>
 
-        <section aria-labelledby="product-image-heading" className="border-t border-slate-100 px-5 py-6 sm:px-7">
+        <section aria-busy={pending || undefined} aria-labelledby="product-image-heading" className="border-t border-slate-100 px-5 py-6 sm:px-7">
           <div className="mb-5"><h2 className="text-lg font-bold text-[#071a43]" id="product-image-heading">รูปสินค้า</h2><p className="mt-1 text-sm text-slate-500">เพิ่มรูปได้ภายหลัง รูปจะถูกอัปโหลดหลังบันทึกข้อมูลสินค้าสำเร็จ</p></div>
+          <p aria-live="polite" className="sr-only">{pending ? selectedFile ? "กำลังบันทึกข้อมูลและอัปโหลดรูปสินค้า" : "กำลังบันทึกข้อมูลสินค้า" : state.imageUploadFailed ? "อัปโหลดรูปสินค้าไม่สำเร็จ" : ""}</p>
           <FilePicker
-            accept="image/jpeg,image/png,image/webp"
-            description="รองรับ JPEG, PNG และ WebP หนึ่งไฟล์ต่อครั้ง ขนาดไฟล์เป็นไปตามข้อกำหนดของระบบ"
+            accept={PRODUCT_IMAGE_ACCEPT}
+            description="รองรับ JPEG, PNG และ WebP หนึ่งไฟล์ต่อครั้ง ขนาดไม่เกิน 5 MB และสูงสุด 10 รูปต่อสินค้า"
             disabled={pending}
+            error={fileError}
             file={selectedFile}
             id="product-image"
             label="ไฟล์รูปสินค้า (ไม่บังคับ)"
@@ -187,7 +176,7 @@ export function ProductForm({ product }: { product?: Product }) {
               ใช้รูปนี้เป็นรูปหลักของสินค้า
             </label>
           ) : null}
-          {product ? <ExistingImages images={product.images} product={product} /> : null}
+          {product ? <ProductImageManager product={product} /> : null}
         </section>
 
         {state.message && !state.ok ? (
@@ -198,7 +187,7 @@ export function ProductForm({ product }: { product?: Product }) {
           </div>
         ) : null}
 
-        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-5 sm:flex-row sm:justify-end sm:px-7"><Link className="inline-flex h-12 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600" href="/products">ยกเลิก</Link><Button isLoading={pending} loadingText={selectedFile ? (state.productId ? "กำลังอัปโหลดรูป" : "กำลังบันทึกและอัปโหลด") : "กำลังบันทึก"} type="submit">{state.imageUploadFailed ? "บันทึกและลองอัปโหลดอีกครั้ง" : product ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}</Button></div>
+        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-5 sm:flex-row sm:justify-end sm:px-7"><Link className="inline-flex h-12 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600" href="/products">ยกเลิก</Link><Button disabled={Boolean(fileError)} isLoading={pending} loadingText={selectedFile ? (state.productId ? "กำลังอัปโหลดรูป" : "กำลังบันทึกและอัปโหลด") : "กำลังบันทึก"} type="submit">{state.imageUploadFailed ? "บันทึกและลองอัปโหลดอีกครั้ง" : product ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}</Button></div>
       </div>
       <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600" href="/products"><ArrowLeftIcon className="size-4" />กลับรายการสินค้า</Link>
     </form>

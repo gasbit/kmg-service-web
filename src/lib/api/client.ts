@@ -1,5 +1,5 @@
 import { readAuthToken } from "@/lib/auth/cookies";
-import { ApiError } from "./errors";
+import { ApiError, NETWORK_ERROR_CODE } from "./errors";
 import { isApiResponse, type ApiResponse } from "./response";
 
 type ApiClientOptions = Omit<RequestInit, "body"> & {
@@ -30,11 +30,21 @@ async function request<T>(path: string, options: ApiClientOptions = {}) {
   if (requestBody !== undefined && !isFormData) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(url, {
-    ...options,
-    body: requestBody === undefined ? undefined : isFormData ? requestBody : JSON.stringify(requestBody),
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      body: requestBody === undefined ? undefined : isFormData ? requestBody : JSON.stringify(requestBody),
+      headers,
+    });
+  } catch (error) {
+    throw new ApiError(
+      "Unable to reach API service",
+      NETWORK_ERROR_CODE,
+      503,
+      error instanceof Error ? { cause: error.name } : undefined,
+    );
+  }
   const payload = await parseJson<ApiResponse<T>>(response);
 
   if (!isApiResponse<T>(payload)) {

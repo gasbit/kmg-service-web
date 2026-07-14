@@ -42,7 +42,7 @@ export function FilePicker({ accept, description, disabled, error, file, id, lab
       <label className="mb-2 block text-sm font-semibold text-slate-700" htmlFor={id}>{label}</label>
       <input
         accept={accept}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={[description ? `${id}-description` : null, error ? `${id}-error` : null].filter(Boolean).join(" ") || undefined}
         aria-invalid={Boolean(error)}
         className="sr-only"
         disabled={disabled}
@@ -72,7 +72,7 @@ export function FilePicker({ accept, description, disabled, error, file, id, lab
         </div>
         <div className="flex flex-col justify-center p-5 sm:p-6">
           <p className="font-bold text-[#071a43]">{file ? file.name : "เลือกรูปสินค้า"}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{file ? `${formatFileSize(file.size)} · พร้อมอัปโหลดเมื่อบันทึกสินค้า` : description}</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500" id={`${id}-description`}>{file ? `${formatFileSize(file.size)} · ${error ? "กรุณาเลือกไฟล์ใหม่" : "พร้อมอัปโหลดเมื่อบันทึกสินค้า"}` : description}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button disabled={disabled} leftIcon={<UploadIcon className="size-4" />} onClick={() => inputRef.current?.click()} size="sm" variant="secondary">
               {file ? "เปลี่ยนรูป" : "เลือกไฟล์"}

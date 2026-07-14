@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { PackageIcon, CheckCircleIcon, PauseCircleIcon } from "@/components/icon/icons";
 import { redirect } from "next/navigation";
-import { ApiError } from "@/lib/api/errors";
+import { ApiError, NETWORK_ERROR_CODE, toUserMessage } from "@/lib/api/errors";
 import { getProducts } from "@/features/products/product.api";
 import { ProductLoadError } from "@/features/products/product-load-error";
 import { ProductPagination } from "@/features/products/product-pagination";
@@ -38,7 +38,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     result = await getProducts({ page, limit, search: search || undefined, includeInactive });
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) redirect("/api/auth/session/clear");
-    return <main><PageHeader description="จัดการข้อมูลสินค้าและราคาขาย" title="สินค้า" /><div className="p-4 sm:p-6 lg:p-8 lg:pt-4"><ProductLoadError forbidden={error instanceof ApiError && error.status === 403} requestId={error instanceof ApiError ? error.requestId : undefined} /></div></main>;
+    const networkMessage = error instanceof ApiError && error.code === NETWORK_ERROR_CODE ? toUserMessage(error.code) : undefined;
+    return <main><PageHeader description="จัดการข้อมูลสินค้าและราคาขาย" title="สินค้า" /><div className="p-4 sm:p-6 lg:p-8 lg:pt-4"><ProductLoadError forbidden={error instanceof ApiError && error.status === 403} message={networkMessage} requestId={error instanceof ApiError ? error.requestId : undefined} /></div></main>;
   }
   const { products, pagination } = result;
   const lastPage = Math.max(pagination.totalPages, 1);

@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { CheckCircleIcon, EditIcon, PackageIcon, PauseCircleIcon, TrashIcon } from "@/components/icon/icons";
+import { CheckCircleIcon, EditIcon, PauseCircleIcon, TrashIcon } from "@/components/icon/icons";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/lib/hooks/use-toast";
 import { setProductActiveAction } from "./actions";
+import { ProductImage } from "./product-image";
 import type { Product } from "./product.types";
 
 const money = new Intl.NumberFormat("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -16,25 +18,29 @@ const formatDate = (value: string) => { const parsed = new Date(value); return N
 
 function ProductVisual({ product }: { product: Product }) {
   const image = product.images.find((item) => item.isPrimary) ?? product.images[0];
-  return image ? <span aria-label={`รูปสินค้า ${product.brand} ${product.weightKg} กิโลกรัม`} className="size-12 shrink-0 rounded-xl border border-slate-200 bg-white bg-contain bg-center bg-no-repeat" role="img" style={{ backgroundImage: `url(${JSON.stringify(image.url)})` }} /> : <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-500"><PackageIcon className="size-6" /></span>;
+  return <ProductImage alt={`รูปสินค้า ${product.brand} ${product.weightKg} กิโลกรัม`} className="size-12 rounded-xl border border-slate-200" image={image} />;
 }
 
 function StatusBadge({ active }: { active: boolean }) { return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>{active ? <CheckCircleIcon className="size-3.5" /> : <PauseCircleIcon className="size-3.5" />}{active ? "ใช้งาน" : "ปิดใช้งาน"}</span>; }
 
 export function ProductTable({ products }: { products: Product[] }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [selected, setSelected] = useState<Product | null>(null);
-  const [feedback, setFeedback] = useState("");
   const [pending, startTransition] = useTransition();
   const confirm = () => selected && startTransition(async () => {
     const result = await setProductActiveAction(selected.id, !selected.isActive);
-    setFeedback(result.requestId ? `${result.message} (รหัสอ้างอิง ${result.requestId})` : result.message);
+    toast({
+      description: result.ok ? undefined : result.message,
+      requestId: result.requestId,
+      title: result.ok ? result.message : "เปลี่ยนสถานะสินค้าไม่สำเร็จ",
+      variant: result.ok ? "success" : "error",
+    });
     if (result.ok) { setSelected(null); router.refresh(); }
   });
 
   return (
     <>
-      {feedback ? <div className="border-b border-blue-100 bg-blue-50 px-5 py-3 text-sm font-medium text-blue-800" role="status">{feedback}</div> : null}
       <div className="hidden overflow-x-auto md:block">
         <Table>
           <caption className="sr-only">รายการสินค้า</caption>
@@ -43,7 +49,7 @@ export function ProductTable({ products }: { products: Product[] }) {
             <TableCell><div className="flex min-w-52 items-center gap-3"><ProductVisual product={product} /><div><p className="font-semibold text-[#071a43]">{product.brand}</p><p className="mt-0.5 text-xs text-slate-500">{Number(product.weightKg).toLocaleString("th-TH")} กก.</p></div></div></TableCell>
             <TableCell className="font-medium">{money.format(Number(product.exchangeCostPrice))}</TableCell><TableCell className="font-bold text-blue-600">{money.format(Number(product.exchangeSalePrice))}</TableCell><TableCell className="font-medium">{money.format(Number(product.fullTankPrice))}</TableCell>
             <TableCell><StatusBadge active={product.isActive} /></TableCell><TableCell className="whitespace-nowrap text-xs text-slate-500">{formatDate(product.updatedAt)}</TableCell>
-            <TableCell><div className="flex justify-end gap-2"><Link aria-label={`แก้ไขสินค้า ${product.brand}`} className="grid size-10 place-items-center rounded-lg border border-blue-200 text-blue-600 transition hover:bg-blue-50" href={`/products/${product.id}/edit`}><EditIcon className="size-4" /></Link><button aria-label={`${product.isActive ? "ปิด" : "เปิด"}ใช้งานสินค้า ${product.brand}`} className={`grid size-10 place-items-center rounded-lg border transition ${product.isActive ? "border-red-200 text-red-500 hover:bg-red-50" : "border-emerald-200 text-emerald-600 hover:bg-emerald-50"}`} onClick={() => { setFeedback(""); setSelected(product); }} type="button">{product.isActive ? <TrashIcon className="size-4" /> : <CheckCircleIcon className="size-4" />}</button></div></TableCell>
+            <TableCell><div className="flex justify-end gap-2"><Link aria-label={`แก้ไขสินค้า ${product.brand}`} className="grid size-10 place-items-center rounded-lg border border-blue-200 text-blue-600 transition hover:bg-blue-50" href={`/products/${product.id}/edit`}><EditIcon className="size-4" /></Link><button aria-label={`${product.isActive ? "ปิด" : "เปิด"}ใช้งานสินค้า ${product.brand}`} className={`grid size-10 place-items-center rounded-lg border transition ${product.isActive ? "border-red-200 text-red-500 hover:bg-red-50" : "border-emerald-200 text-emerald-600 hover:bg-emerald-50"}`} onClick={() => setSelected(product)} type="button">{product.isActive ? <TrashIcon className="size-4" /> : <CheckCircleIcon className="size-4" />}</button></div></TableCell>
           </TableRow>)}</TableBody>
         </Table>
       </div>

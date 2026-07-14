@@ -121,6 +121,8 @@ Legend:
 
 ### 4. Activate/deactivate แบบ soft delete
 
+สถานะ: `Done` จาก source, lint และ production build; browser/API E2E รวมอยู่ในหมวด verification
+
 - [x] Active product แสดง action ปิดใช้งาน
 - [x] Inactive product แสดง action เปิดใช้งาน
 - [x] Deactivate เรียก `DELETE /products/:id`
@@ -129,11 +131,13 @@ Legend:
 - [x] ป้องกัน submit ซ้ำและไม่ใช้ optimistic state
 - [x] Mutation failure คง dialog ไว้และแสดง message/request ID
 - [x] Mutation success revalidate และ refresh list
-- [ ] เปลี่ยน feedback สำเร็จ/ล้มเหลวให้ใช้ shared Toast ตาม screen spec; ปัจจุบันเป็น inline status บน table
+- [x] Feedback สำเร็จ/ล้มเหลวใช้ global shared Toast พร้อม request ID, auto-dismiss, manual close และ `aria-live`
 
 หลักฐานหลัก: `product-table.tsx`, `actions.ts`, `product.api.ts`
 
 ### 5. Product image flow
+
+สถานะ: `Done` จาก source, lint และ production build; authenticated browser/API E2E รวมอยู่ในหมวด verification
 
 - [x] เลือกไฟล์จาก file picker หรือ drag-and-drop ได้หนึ่งไฟล์ต่อครั้ง
 - [x] แสดง local preview, ชื่อไฟล์, ขนาดไฟล์, เปลี่ยนไฟล์ และเอาไฟล์ออกได้
@@ -145,16 +149,18 @@ Legend:
 - [x] หาก upload หลัง create ล้มเหลว สามารถ submit ซ้ำด้วย `productId` เดิมโดยไม่สร้าง product ซ้ำ
 - [x] หน้า edit แสดง current images และสถานะรูปหลัก
 - [x] หน้า edit สามารถ upload รูปเพิ่มและกำหนดรูปที่ upload เป็น primary ได้
-- [ ] เพิ่ม action ตั้งรูปเดิมให้เป็น primary ผ่าน image `PATCH`
-- [ ] เพิ่ม action แก้ `sortOrder` ของรูปเดิมผ่าน image `PATCH`
-- [ ] เพิ่ม action ลบรูปเดิมผ่าน image `DELETE` พร้อม confirmation
-- [ ] เพิ่ม feature API wrappers สำหรับ list/update/delete image ให้ครบ contract
-- [ ] เพิ่ม client-side file guidance/error ก่อน upload เมื่อ MIME/ขนาดผิดอย่างชัดเจน โดย backend ยังเป็น final authority
-- [ ] เพิ่ม `aria-busy` และ `aria-live` สำหรับสถานะกำลัง upload/success/failure
+- [x] ตั้งรูปเดิมให้เป็น primary ผ่าน secure frontend Route Handler และ image `PATCH`
+- [x] แก้ `sortOrder` ของรูปเดิมผ่าน image `PATCH` พร้อม validation และเรียงผลล่าสุด
+- [x] ลบรูปเดิมผ่าน image `DELETE` พร้อม confirmation และแจ้งชัดเจนว่า backend ไม่เลือก primary ใหม่อัตโนมัติ
+- [x] มี feature API wrappers สำหรับ list/upload/update/delete image ครบ contract
+- [x] ตรวจ JPEG/PNG/WebP, ไฟล์ว่าง, ขนาดไม่เกิน 5 MB และจำนวนสูงสุด 10 รูปก่อน upload โดย backend ยังเป็น final authority
+- [x] Upload/image mutations มี `aria-busy`, `aria-live`, pending control และ global Toast สำหรับ success/failure/request ID
 
 หลักฐานหลัก: `product-form.tsx`, `src/components/ui/file-picker.tsx`, `src/app/api/products/[productId]/images/route.ts`, `product.api.ts`
 
 ### 6. Loading, error และ feedback states
+
+สถานะ: `Done` จาก source, lint และ production build; network/browser E2E รวมอยู่ในหมวด verification
 
 - [x] มี route-level loading skeleton
 - [x] มี route-level error boundary
@@ -163,11 +169,11 @@ Legend:
 - [x] แยก forbidden state และมีทางกลับ dashboard
 - [x] แยก empty database กับ empty filtered state
 - [x] Mutation มี pending และ failure feedback
-- [ ] แสดง success toast หลัง create/edit ตาม navigation workflow; ปัจจุบัน redirect กลับ list โดยไม่มี success message ที่คงอยู่
-- [ ] Map network/offline error เป็น copy เฉพาะ “ไม่สามารถเชื่อมต่อบริการได้”
-- [ ] เพิ่ม error state เฉพาะ image ที่โหลดไม่ได้ โดยไม่ให้กระทบทั้ง row
+- [x] แสดง global success Toast หลัง create/edit และคงอยู่ระหว่าง client navigation กลับรายการสินค้า
+- [x] Map network/offline error ที่ API client กลางเป็น copy เฉพาะ “ไม่สามารถเชื่อมต่อบริการได้”
+- [x] เพิ่ม `ProductImage` fallback เฉพาะ image ที่โหลดไม่ได้ โดยไม่ให้กระทบทั้ง row หรือ image manager
 
-หลักฐานหลัก: `loading.tsx`, `error.tsx`, `product-load-error.tsx`, `product-form.tsx`, `product-table.tsx`
+หลักฐานหลัก: `loading.tsx`, `error.tsx`, `product-load-error.tsx`, `product-form.tsx`, `product-table.tsx`, `product-image.tsx`, `src/lib/api/client.ts`, `src/lib/api/errors.ts`
 
 ### 7. Responsive และ accessibility
 

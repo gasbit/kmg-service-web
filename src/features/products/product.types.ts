@@ -32,6 +32,8 @@ export type ProductListQuery = {
 
 export type ProductPagination = { page: number; limit: number; totalItems: number; totalPages: number };
 export type ProductWriteInput = Pick<Product, "brand" | "weightKg" | "exchangeCostPrice" | "exchangeSalePrice" | "fullTankPrice">;
+export type ProductImageUpdateInput = { isPrimary?: boolean; sortOrder?: number };
+export type DeletedProductImage = { deletedImageId: string };
 
 export type ProductActionState = {
   imageUploadFailed?: boolean;
