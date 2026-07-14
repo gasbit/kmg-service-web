@@ -74,6 +74,8 @@ export function PackageIcon(props: IconProps) { return <Icon {...props}><path d=
 export function CheckCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="m8 12 2.5 2.5L16 9" {...stroke} /></Icon>; }
 export function PauseCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M10 9v6m4-6v6" {...stroke} /></Icon>; }
 export function ArrowLeftIcon(props: IconProps) { return <Icon {...props}><path d="m15 18-6-6 6-6" {...stroke} /></Icon>; }
+export function UploadIcon(props: IconProps) { return <Icon {...props}><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5" {...stroke} /></Icon>; }
+export function ImageIcon(props: IconProps) { return <Icon {...props}><rect height="16" rx="2" width="18" x="3" y="4" {...stroke} /><circle cx="8.5" cy="9" r="1.5" {...stroke} /><path d="m5 18 4.5-4.5 3 3 2-2L19 18" {...stroke} /></Icon>; }
 
 export function UserIcon(props: IconProps) {
   return <Icon {...props}><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 1 0-14 0" {...stroke} /></Icon>;

@@ -4,14 +4,14 @@
 
 - Status: Ready for review
 - Owner: KMG-SERVICE-WEB / `products`
-- Last updated: 2026-07-12
+- Last updated: 2026-07-14
 - Related design: `/Users/gas.bit/Downloads/2737b2d1-7b32-45b5-9af9-0ce842f38090.png`
 - Related API: `../KMG-SERVICE-API/src/modules/products/product-spec.md`, Product routes/schemas/controllers/services ณ 2026-07-12
 
 ## 2. Summary
 
 - Purpose: ให้ Admin ค้นหา ตรวจสอบ และจัดการ product master ที่ใช้กับรายการขาย/แลกถัง โดยเห็นราคา สถานะ และรูปสินค้าอย่างรวดเร็ว
-- User outcome: Admin เปิดหน้าแล้วค้นหาสินค้า ดูข้อมูลหลัก เพิ่ม แก้ไข เปิดใช้งาน และปิดใช้งานสินค้าได้ โดยไม่ทำลายประวัติ transaction เดิม
+- User outcome: Admin เปิดหน้าแล้วค้นหาสินค้า ดูข้อมูลหลัก เพิ่ม แก้ไข อัปโหลด/จัดการรูป เปิดใช้งาน และปิดใช้งานสินค้าได้ โดยไม่ทำลายประวัติ transaction เดิม
 - Route: `/products`
 - Owning route: `src/app/(app)/products/page.tsx`
 - Owning feature: `src/features/products`
@@ -26,6 +26,7 @@
 - Product list พร้อม server-side search, active filter และ pagination
 - แสดงรูปหลักหรือ fallback, brand, weight, ราคาทุนแลก, ราคาขายแลก, ราคาถังเต็ม และสถานะ active
 - ปุ่มเพิ่มสินค้า, แก้ไขสินค้า, ปิดใช้งานสินค้า และเปิดใช้งานสินค้าที่ inactive
+- หน้าเพิ่ม/แก้ไขสินค้ารองรับการเลือกไฟล์รูป, preview, อัปโหลดรูปหลังมี `productId`, กำหนดรูปหลัก และลองอัปโหลดซ้ำเมื่อผิดพลาด
 - รองรับ empty/loading/error/permission/mutation states
 - เก็บ filter และ pagination ใน URL เพื่อให้ refresh/back/forward/share URL แล้วได้ผลเดิม
 - ใช้ product/image API ที่ backend implement แล้ว
@@ -36,7 +37,7 @@
 - การ hard delete สินค้า
 - category, SKU, stock threshold และ stock status จนกว่าจะมี approved data contract
 - การคำนวณผลกระทบ transaction, inventory หรือ historical price snapshots ใน frontend
-- รายละเอียดหน้าสร้าง/แก้ไขและ image manager เชิงลึก ซึ่งควรมี screen spec แยก แต่ navigation และผลลัพธ์หลัง mutationถูกกำหนดไว้ในเอกสารนี้
+- image manager ขั้นสูง เช่น crop/resize, drag-and-drop reordering หลายรูป, image transformation และ bulk upload; สเปกนี้ครอบคลุม upload รูปหนึ่งไฟล์ต่อ request และการกำหนดรูปหลักที่จำเป็นต่อ create/edit flow
 
 ## 4. Sources and decisions
 
@@ -59,6 +60,7 @@
 - ราคาทั้งสามช่องแสดง 2 ตำแหน่งพร้อมตัวคั่นหลักพันและหน่วยบาทใน header
 - รูปสินค้าใช้ primary image ก่อน; ถ้าไม่มี primary ใช้รูปแรกตามลำดับ API; ถ้าไม่มีรูปใช้ shared product placeholder
 - การแก้ไข/เปิดใช้งานใช้ route `/products/[id]/edit`; การสร้างใช้ `/products/new`
+- การสร้างสินค้าและอัปโหลดรูปเป็นคนละ API operation: ต้องสร้างสินค้าให้สำเร็จและได้ `productId` ก่อน จึงอัปโหลดรูปได้
 
 ### Open decisions and conflicts
 
@@ -74,7 +76,8 @@
 - Exit paths: sidebar routes, `เพิ่มสินค้า`, `แก้ไขสินค้า`
 - Primary workflow: เปิดหน้า → server อ่าน URL query → fetch list → สแกน summary/list → ค้นหา/กรอง/เปลี่ยนหน้า → เปิด create/edit หรือเปลี่ยนสถานะ
 - Alternate paths: ไม่มีสินค้า, filter ไม่พบผล, session หมดอายุ, ไม่มีสิทธิ์, backend ล้มเหลว, mutation conflict/validation failure
-- หลัง create/update สำเร็จ: กลับ `/products`, revalidate/refresh list และ toast “บันทึกข้อมูลสินค้าแล้ว”
+- หลัง create ไม่มีรูปหรือ create/update พร้อมรูปสำเร็จ: กลับ `/products`, revalidate/refresh list และ toast “บันทึกข้อมูลสินค้าแล้ว”
+- หลัง create สำเร็จแต่อัปโหลดรูปไม่สำเร็จ: ถือว่าสินค้าถูกสร้างแล้ว, คงผู้ใช้ไว้ที่ edit/image section ของสินค้านั้น, แจ้งว่า “สร้างสินค้าแล้ว แต่อัปโหลดรูปไม่สำเร็จ” และให้ลองอัปโหลดซ้ำโดยไม่ส่ง create ซ้ำ
 - หลัง deactivate สำเร็จ: ปิด dialog, refresh list; แถวหายเมื่อ `includeInactive=false` หรือเปลี่ยนเป็น inactive เมื่อแสดงทั้งหมด
 
 ## 6. Screen composition
@@ -88,6 +91,7 @@
 | Product table | image + brand/weight, three prices, status, updated time, actions | proposed compound `Table` primitives, `Button`, shared icons | horizontal scroll ที่ tablet; compact stacked rows/cards ที่ mobile |
 | Pagination | result range, previous/page/next, page size | proposed `Pagination` | wrap เป็น 2 แถว; controls ≥44px |
 | Status dialog | ยืนยันปิดใช้งาน หรือยืนยันเปิดใช้งาน | proposed accessible `Dialog` | centered desktop; bottom-sheet-like width on mobile |
+| Product image upload | file picker/drop zone, preview, upload status, current images และ primary control ใน create/edit form | `Button`, shared icons, proposed `ProductImageUploader` | desktop แสดง preview ข้าง control; mobile stack และ touch target ≥44px |
 | Feedback | success/error toast | `Toast` | viewport-safe, screen-reader announced |
 
 ## 7. Data contract
@@ -96,6 +100,9 @@
 | --- | --- | --- | --- | --- |
 | Product ID | `product.id` | Required | decimal string; ไม่แสดงใน table | backend identifier |
 | รูปสินค้า | `product.images[]` | Required array | primary → first → placeholder; alt `รูปสินค้า {brand} {weight}` | current master image URL; URL ไม่ใช่ persistent ID |
+| ไฟล์รูปที่เลือก | `FormData.file` | Required เมื่อสั่ง upload | binary หนึ่งไฟล์ต่อ request; preview เป็นสถานะชั่วคราวใน browser | backend ตรวจ MIME/content/ขนาด; ห้ามเก็บ Base64 เป็น product data |
+| ลำดับรูป | `FormData.sortOrder` | Optional | integer ≥0; default `0` | backend authority |
+| รูปหลัก | `FormData.isPrimary` | Optional | boolean; default `false` | เมื่อ `true` backend ทำให้เหลือ primary เพียงรูปเดียวแบบ atomic |
 | ยี่ห้อ | `product.brand` | Required | plain text | current master; editable |
 | น้ำหนัก | `product.weightKg` | Required | `{value} กก.`; preserve decimal meaning | current master; editable |
 | ราคาทุนแลก | `product.exchangeCostPrice` | Required | `th-TH`, 2 decimals | THB; editable; backend validates |
@@ -119,7 +126,11 @@
 - Create: `POST /products` JSON fields `brand`, `weightKg`, `exchangeCostPrice`, `exchangeSalePrice`, `fullTankPrice`
 - Update/reactivate: `PATCH /products/:id`; reactivate ส่ง `{ isActive: true }`
 - Deactivate: `DELETE /products/:id`; เป็น idempotent soft delete
-- Image endpoints แยกจาก list screen และควรอยู่ใน product form/image manager
+- Upload image: `POST /products/:productId/images` เป็น `multipart/form-data` มี `file` บังคับ และ `sortOrder`/`isPrimary` เป็น optional; สำเร็จด้วย `201 Created`
+- List images: `GET /products/:productId/images`; update metadata/primary: `PATCH /products/:productId/images/:imageId`; delete: `DELETE /products/:productId/images/:imageId`
+- Create พร้อมรูปต้องทำตามลำดับ `POST /products` → รับ `productId` → `POST /products/:productId/images`; ห้ามส่งไฟล์รวมใน JSON create request
+- การ upload ผ่าน Server Action หรือ frontend Route Handler ที่อ่าน session จาก httpOnly cookie และ forward multipart ไป backend; ห้ามเรียก backend ด้วย Bearer token จาก Client Component
+- multipart wrapper ต้องส่ง `FormData` โดยไม่บังคับ `Content-Type: application/json` และไม่ตั้ง multipart boundary เอง
 - ทุก mutation ต้องทำผ่าน Server Action หรือ frontend Route Handler ที่ตรวจ session/role และเรียก feature wrapper; success แล้ว `revalidatePath('/products')`
 
 ### API gaps
@@ -134,10 +145,10 @@
 ## 8. Rendering and component boundaries
 
 - Server-rendered regions: page header, URL query parsing, initial API read, summary ที่ยืนยันได้, table content และ pagination links
-- Client-interactive regions: debounced search/status toolbar, refresh button, deactivate/reactivate confirmation dialog, mutation pending/toast
+- Client-interactive regions: debounced search/status toolbar, refresh button, deactivate/reactivate confirmation dialog, file selection/local preview/remove-before-upload, mutation pending/toast
 - Cache/refresh behavior: fresh operational data (`cache: 'no-store'`); filter/page navigation fetch ใหม่; manual refresh รักษา URL; ไม่มี silent polling
 - Shared dependencies: `PageHeader`, app shell, `Button`, `Input`, `Card`, `Toast`, icons; ต้องขยาย `Select`, `Table`, `Dialog` ให้มี styling/semantics ก่อนใช้งาน
-- Proposed reusable components: `StatusBadge`, `Pagination`, `EmptyState`, `ProductImage`; วาง domain-neutral component ใต้ `src/components/ui`/`icon` และ product-specific composition ใต้ `src/features/products`
+- Proposed reusable components: `StatusBadge`, `Pagination`, `EmptyState`, `ProductImage`; `ProductImageUploader` เป็น product-specific composition ใต้ `src/features/products` และ file input/button/icon ใช้ shared primitives
 - Page file ทำเฉพาะ route composition/data boundary; product toolbar/table/actions อยู่ใน feature folder
 - Next.js deprecation/behavior note: อย่าใช้ Pages Router data methods; URL search params และ dynamic params ใน App Router version นี้เป็น async contract ตาม local docs เมื่อ type ของ page ต้องใช้
 
@@ -151,6 +162,9 @@
 | Empty database | “ยังไม่มีสินค้า” + “เพิ่มสินค้าแรก” | เพิ่มสินค้า, รีเฟรช | ไป `/products/new` |
 | Empty filtered | “ไม่พบสินค้าที่ตรงกับคำค้นหรือเงื่อนไข” | ล้างตัวกรอง, รีเฟรช | กลับ page 1 พร้อม filter ใหม่ |
 | Partial image | placeholder เฉพาะ row; table ยังใช้งานได้ | actions ปกติ | ไม่ fail ทั้งหน้าเพราะรูปเดียว |
+| Image selected | แสดง local preview, ชื่อไฟล์ และปุ่มเอาออกก่อน submit | เอาออก/เปลี่ยนไฟล์/บันทึก | revoke object URL เมื่อเปลี่ยนไฟล์หรือ unmount |
+| Image uploading | preview คงอยู่, upload control `aria-busy`, ปุ่ม submit/เปลี่ยนไฟล์ disabled | ไม่มี submit ซ้ำ | สำเร็จใช้ URL/metadata จาก backend; ล้มเหลวเข้าสู่ upload failure |
+| Image upload failure after create | แจ้ง “สร้างสินค้าแล้ว แต่อัปโหลดรูปไม่สำเร็จ” และคงข้อมูลสินค้า/ไฟล์ที่เลือกเมื่อ browser ยังถือไฟล์ได้ | ลองอัปโหลดอีกครั้ง/ข้ามรูปและกลับรายการ | retry เฉพาะ image endpoint ด้วย `productId` เดิม; ห้าม create product ซ้ำ |
 | Validation error | ใต้ field ใน form/dialog ตาม error; list query invalid normalize หรือแสดง request error | แก้ค่า/ลองใหม่ | submit ใหม่ |
 | API error | “โหลดข้อมูลสินค้าไม่สำเร็จ” และ request ID ถ้ามี | “ลองอีกครั้ง” | refresh query เดิม |
 | Mutation pending | ปุ่มต้นทาง disabled + spinner; dialog ปิดไม่ได้ด้วย submit ซ้ำ | cancel disabled เฉพาะช่วง critical request | success/failure |
@@ -169,6 +183,10 @@
 | Refresh | ADMIN | ไม่มี | spinner, disabled | list refresh; toast ไม่จำเป็น | error toast + retry |
 | Add product | ADMIN | ไม่มี | navigation feedback จาก route | `/products/new` | route error boundary |
 | Edit | ADMIN; ทุก row รวม inactive | ไม่มี | navigate | `/products/{id}/edit` | not-found/error state |
+| Select image | create/edit form; enabled เมื่อไม่ pending | ไม่มี | สร้าง local preview เท่านั้น ยังไม่ส่ง network | แสดงชื่อ/preview | แสดงคำแนะนำไฟล์และให้เลือกใหม่ |
+| Save new product with image | ADMIN; product fields valid และมีไฟล์เลือก | ไม่มี | ปิด submit ซ้ำ; แสดงขั้น “กำลังบันทึกสินค้า” แล้ว “กำลังอัปโหลดรูป” | create แล้ว upload ด้วย ID ที่ได้; refresh list/redirect | ถ้า create fail ไม่ upload; ถ้า upload fail ใช้ partial-success recovery โดยไม่ create ซ้ำ |
+| Upload image on edit | ADMIN; มี `productId` และไฟล์เลือก | ไม่มี | control เฉพาะส่วนรูป disabled/`aria-busy` | เพิ่มรูปจาก response และ refresh product/list | form และ current images คงอยู่; retry ได้ |
+| Set primary image | ADMIN; image มีอยู่และยังไม่เป็น primary | ไม่มี | control ของ image นั้น disabled | PATCH `{ isPrimary: true }`; refresh images/list | current primary คงตาม server response; แสดง safe error |
 | Deactivate | เฉพาะ active row | dialog: “ปิดใช้งานสินค้านี้?” และแจ้งว่าจะไม่ลบประวัติ | confirm disabled/spinner; no optimistic removal | toast “ปิดใช้งานสินค้าแล้ว”; refresh | dialog คงอยู่; แสดง backend message ที่ปลอดภัย |
 | Reactivate | เฉพาะ inactive row | dialog: “เปิดใช้งานสินค้านี้อีกครั้ง?” | เช่นเดียวกัน | toast “เปิดใช้งานสินค้าแล้ว”; refresh | เช่นเดียวกัน |
 | Change page/size | เมื่อ pagination มีมากกว่า 1 หน้า/รองรับ size | ไม่มี | table pending | URL/data update; scroll/focus heading/table | error with retry |
@@ -193,6 +211,9 @@
 | ราคาขายแลก | decimal | เหมือนด้านบน | backend authority | เหมือนด้านบน |
 | ราคาถังเต็ม | decimal | เหมือนด้านบน | backend authority | เหมือนด้านบน |
 | เปิดใช้งาน | switch/checkbox (edit only) | ไม่ส่งใน create | optional boolean ใน PATCH | “ไม่สามารถเปลี่ยนสถานะได้” |
+| รูปสินค้า | file input (`accept="image/*"`) | เลือกหนึ่งไฟล์ต่อ upload, แสดงชื่อ/preview และอนุญาตเอาออกก่อนส่ง; `accept` เป็นเพียงคำแนะนำ | backend ตรวจ MIME type, file signature, extension, file size และจำนวนรูปตาม policy | “ไฟล์รูปไม่ถูกต้องหรือไม่เป็นไปตามข้อกำหนด กรุณาเลือกไฟล์ใหม่” และแสดง backend message ที่ปลอดภัยเมื่อมี |
+| ลำดับรูป | number (เมื่อเปิดให้แก้) | integer ≥1 ใน UI | แสดง `sortOrder + 1` และส่งกลับเป็น `ค่าที่กรอก - 1`; backend default 0 | “ลำดับรูปต้องเป็นจำนวนเต็มตั้งแต่ 1” |
+| รูปหลัก | checkbox/switch | ส่ง `true` เมื่อต้องการให้รูปที่อัปโหลด/เลือกเป็นรูปหลัก | backend รักษา primary ได้เพียงหนึ่งรูปแบบ atomic | “ไม่สามารถกำหนดรูปหลักได้” |
 
 Frontend validation เป็น assistive เท่านั้น ต้องแสดง validation/error จาก backend และห้าม derive price/stock business rules เพิ่มเอง
 
@@ -212,6 +233,7 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
 - Errors: route error ใช้ `role=alert`; mutation/toast ใช้ `aria-live=polite` (urgent auth/permission ใช้ assertive ตามเหมาะสม)
 - Status: badge มีข้อความ “ใช้งาน/ปิดใช้งาน” ไม่พึ่งสี; loading ใช้ `aria-busy`; disabled state ชัดเจน
 - Images: meaningful alt ตาม product; decorative placeholder icon ซ่อนจาก screen reader
+- Upload: file input มี label ชัดเจน, preview มี alt ที่อธิบายว่าเป็นรูปตัวอย่าง, สถานะ “กำลังอัปโหลด/สำเร็จ/ไม่สำเร็จ” ประกาศผ่าน `aria-live`, และ error ผูกกับ input ด้วย `aria-describedby`
 - Touch target: actions อย่างน้อย 44×44px บน mobile
 
 ## 14. Acceptance criteria
@@ -229,14 +251,19 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
 11. Given keyboard-only user เมื่อเปิด/ปิด confirmation dialog แล้ว focus ถูก trap และคืนกลับ trigger; ทุก action มี accessible name.
 12. Given API ยังไม่คืน stock/category เมื่อเปิดหน้าแล้ว UI ไม่แสดงตัวเลข mock, ไม่คำนวณ low-stock เอง และไม่แสดง filter ที่ทำงานไม่ตรง contract.
 13. Given Admin แก้ราคา เมื่อบันทึกสำเร็จแล้ว list แสดง master price ล่าสุด แต่ UI ไม่อ้างว่าราคาใน transaction history ถูกแก้ย้อนหลัง.
+14. Given Admin เพิ่มสินค้าและเลือกรูป เมื่อ submit แล้ว frontend สร้างสินค้าก่อนหนึ่งครั้ง, ใช้ `productId` จาก response อัปโหลด `multipart/form-data` ที่มี field `file`, และไม่ส่งไฟล์ใน JSON create request.
+15. Given create สำเร็จแต่ image upload ล้มเหลว เมื่อแสดงผลแล้วผู้ใช้ทราบว่าสินค้าถูกสร้างแล้วและ retry เฉพาะ upload ด้วย ID เดิมได้โดยไม่สร้างสินค้าซ้ำ.
+16. Given Admin เลือกไฟล์รูป เมื่อยังไม่ submit แล้วเห็น preview/ชื่อไฟล์และเอาออกหรือเปลี่ยนไฟล์ได้; browser `accept` ไม่ถูกใช้แทน backend validation.
+17. Given upload สำเร็จโดยส่ง `isPrimary=true` เมื่อ refresh product/list แล้วใช้รูปนั้นเป็น primary ตาม backend response และ UI ไม่คาดเดาสถานะก่อน response สำเร็จ.
+18. Given upload กำลังทำงาน เมื่อกด submit ซ้ำแล้วไม่มี request ซ้ำ, control มี accessible pending state และ access token ไม่ปรากฏใน browser JavaScript/storage.
 
 ## 15. Risks and follow-up
 
 - Implementation mismatches: route/table/API/types/schema ปัจจุบันเป็น placeholder; `Select`, `Table`, `Dialog` เป็น raw wrappers ที่ยังไม่พอสำหรับภาพและ accessibility; `apiClient` ไม่คืน response meta
 - Breaking-change concerns: การขยาย `apiClient` ให้คืน meta อาจกระทบ auth callers ควรเพิ่ม overload/helper เช่น `apiClientWithMeta` แทนเปลี่ยน return shape ทั้งระบบทันที
 - Dependencies: backend running contract, session cookie, product list meta, image host configuration และ approved decision เรื่อง stock/category
+- Upload dependency: feature API/client ต้องรองรับ `FormData` โดยไม่ serialize เป็น JSON และ Server Action/Route Handler ต้อง forward multipart พร้อม session auth อย่างปลอดภัย
 - API document follow-up: เปลี่ยนสถานะ `product-spec.md` จาก “ยังไม่มี implementation” ให้ตรงกับ source/test ปัจจุบัน
-- Product follow-up: แยก screen spec สำหรับ create/edit/image manager ก่อน implement forms เต็มรูปแบบ
+- Product follow-up: หากเพิ่ม multi-image reordering, crop/resize หรือ bulk upload ให้แยก screen spec สำหรับ image manager ขั้นสูงก่อน implement
 - Design follow-up: หากต้องตรงภาพทุกช่อง ให้ product/backend owners อนุมัติ category/SKU/stock threshold และ composite read model ก่อน
 - Verification for implementation phase: lint เสมอ; build เมื่อเพิ่ม route/server-client boundary/shared imports; browser test desktop/tablet/mobile และ auth/error flows
-

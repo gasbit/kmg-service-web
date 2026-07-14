@@ -6,7 +6,7 @@ import { useTransition } from "react";
 import { RefreshIcon } from "@/components/icon/icons";
 import { Button } from "@/components/ui/button";
 
-export function ProductLoadError({ forbidden = false, requestId }: { forbidden?: boolean; requestId?: string }) {
+export function ProductLoadError({ forbidden = false, message, requestId }: { forbidden?: boolean; message?: string; requestId?: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   return (
@@ -14,7 +14,7 @@ export function ProductLoadError({ forbidden = false, requestId }: { forbidden?:
       <div className="max-w-md">
         <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-red-50 text-2xl font-bold text-red-500" aria-hidden="true">!</span>
         <h2 className="mt-5 text-xl font-bold text-[#071a43]">{forbidden ? "คุณไม่มีสิทธิ์เข้าถึงข้อมูลสินค้า" : "โหลดข้อมูลสินค้าไม่สำเร็จ"}</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">{forbidden ? "สิทธิ์การใช้งานถูกตรวจสอบโดยระบบหลังบ้าน" : "บริการสินค้าเกิดข้อผิดพลาดชั่วคราว กรุณาลองใหม่อีกครั้ง"}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{forbidden ? "สิทธิ์การใช้งานถูกตรวจสอบโดยระบบหลังบ้าน" : message ?? "บริการสินค้าเกิดข้อผิดพลาดชั่วคราว กรุณาลองใหม่อีกครั้ง"}</p>
         {requestId ? <p className="mt-3 text-xs text-slate-400">รหัสอ้างอิง: {requestId}</p> : null}
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           {forbidden ? <Link className="inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-bold text-white" href="/dashboard">กลับแดชบอร์ด</Link> : <Button isLoading={pending} leftIcon={<RefreshIcon className="size-4" />} loadingText="กำลังลองใหม่" onClick={() => startTransition(() => router.refresh())}>ลองอีกครั้ง</Button>}
