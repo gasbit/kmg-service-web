@@ -38,7 +38,8 @@ import type { Product, ProductPagination } from "@/features/products/product.typ
 import { THAI_PROVINCES } from "@/lib/constants/thai-provinces";
 import { useToast } from "@/lib/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { createTransactionAction, searchTransactionProductsAction } from "./actions";
+import { searchTransactionProductsAction } from "./actions";
+import { createTransactionRequest } from "./transaction.client";
 import {
   TRANSACTION_STEPS,
   TRANSACTION_TYPE_LABELS,
@@ -821,7 +822,7 @@ export function TransactionForm({
     setApiError(null);
     const input = buildCreateTransactionInput(transactionType, customer, selected, note);
     startSubmitTransition(async () => {
-      const result = await createTransactionAction(input);
+      const result = await createTransactionRequest(input);
       if (result.ok) {
         dirtyRef.current = false;
         toast({

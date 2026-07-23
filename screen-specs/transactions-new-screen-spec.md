@@ -93,8 +93,8 @@
 - Product ซ้ำใน create payload ไม่ได้รับอนุญาต
 - `BORROW_CYLINDER` เก็บ `expectedReturnDate` และ `depositAmount` แยกต่อ item; expected date เป็น optional และ deposit default `"0.00"`
 - Product list รองรับ `page`, `limit`, `search` ที่ค้นเฉพาะ brand และ `includeInactive`; product DTO มีรูป ยี่ห้อ น้ำหนัก ราคา และ active status แต่ไม่มี stock/SKU/category
-- Next.js guide ของ version ใน repository: page/layout เป็น Server Components โดยค่าเริ่มต้น; interactive wizard เป็น Client Component; Server Action ต้องตรวจ authentication/authorization ซ้ำ; props จาก server ไป client ต้อง serializable
-- Next.js version ที่ตรวจคือ `16.2.9`; guide ที่เกี่ยวข้องไม่มี deprecation notice สำหรับรูปแบบนี้ แต่มี security warning ให้ตรวจ authentication/authorization ภายในทุก Server Action แม้ route จะถูก guard แล้ว
+- Next.js guide ของ version ใน repository: page/layout เป็น Server Components โดยค่าเริ่มต้น; interactive wizard เป็น Client Component; Server Action และ Route Handler ต้องตรวจ authentication/authorization ซ้ำ; props จาก server ไป client ต้อง serializable
+- Next.js version ที่ตรวจคือ `16.2.9`; create mutation ใช้ frontend Route Handler เพื่อส่ง JSON object ตรง ๆ แทน Server Action argument protocol ที่ครอบ payload ด้วย array
 
 ### User-approved conflict resolutions
 
@@ -153,13 +153,13 @@
 3. Admin เลือก transaction type
 4. ถ้าเลือก `RETURN_CYLINDER`, ปุ่มหลักเปลี่ยนเป็น `เลือกรายการยืม`; เมื่อกดให้ navigate ไป Loan Return flow
 5. สำหรับอีก 4 ประเภท กด `ถัดไป` ไป step 2
-6. Step 2 แสดง `ลูกค้าใหม่` เป็นตัวเลือกที่ใช้งานได้ และกรอก customer snapshot
+6. Step 2 แสดง `ลูกค้าใหม่` เป็นโหมดปัจจุบันแบบ disabled และกรอก customer snapshot
 7. ระบบ validate field ที่จำเป็นตามประเภทก่อนเข้า step 3
 8. Step 3 ค้นหา product, เพิ่มจำนวน และถ้าเป็น borrow ให้กรอกเงื่อนไขต่อ item
 9. ต้องมี product อย่างน้อย 1 รายการก่อนเข้า step 4
 10. Step 4 แสดงประเภท ลูกค้า ที่อยู่ รายการสินค้า preview total และ note
 11. Admin กด `ยืนยันสร้างรายการ`
-12. Server-side mutation ตรวจ session/role, validate payload และเรียก `POST /api/transactions`
+12. Frontend `POST /api/transactions` Route Handler รับ JSON object, ตรวจ session/role, validate payload และเรียก Backend `POST /api/transactions`
 13. Success: revalidate `/dashboard`, `/transactions`, `/queues`, `/loans`; navigate ไป transaction detail
 14. Failure: คง draft/step 4 ไว้ แสดง error ที่แก้ไขหรือ retry ได้ และไม่อ้างว่ารายการถูกสร้าง
 
@@ -354,7 +354,8 @@
   - Borrow item fields
   - Confirmation summary and dirty-state dialog
 - Mutation boundary:
-  - `createTransactionAction` เป็น Server Action หรือ frontend Route Handler ที่ตรวจ auth/role และเรียก `transaction.api.ts`
+  - Browser ส่ง create payload เป็น JSON object ไป frontend `POST /api/transactions` Route Handler โดยไม่ผ่าน Server Action argument serialization
+  - `transaction.server.ts` ตรวจ auth/role, validate input, เรียก `transaction.api.ts` และ revalidate routes ที่เกี่ยวข้อง
   - Client Component รับเฉพาะ serializable product DTO/draft/result
 - Cache/refresh:
   - Initial product dataใช้ fresh read หรือ short revalidation ตาม Product feature; product searchต้องไม่พึ่ง stale browser cache
@@ -380,7 +381,7 @@
 - Page fileทำเฉพาะ route composition/data boundary; ห้ามฝัง wizard UI ทั้งหมดใน `page.tsx`
 - Next.js version note:
   - Page/layout เป็น Server Components โดย default
-  - Server Action ต้องตรวจ auth/authorization แม้ route ถูก guard แล้ว
+  - Server Action และ Route Handler ต้องตรวจ auth/authorization แม้ route ถูก guard แล้ว
   - หลีกเลี่ยง Pages Router APIs
   - ลด `"use client"` boundary ให้ครอบเฉพาะ wizard/interaction tree
 
