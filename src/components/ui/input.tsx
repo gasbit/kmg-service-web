@@ -11,6 +11,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function Input({
   className,
+  disabled,
   inputClassName,
   leftIcon,
   rightElement,
@@ -33,6 +34,7 @@ export function Input({
           "h-full min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:text-slate-600 disabled:opacity-100 disabled:placeholder:text-slate-500",
           inputClassName,
         )}
+        disabled={disabled}
         {...props}
       />
       {rightElement}

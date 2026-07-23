@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils/cn";
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
-export function Select({ className, ...props }: SelectProps) {
+export function Select({ className, disabled, ...props }: SelectProps) {
   return (
     <span className="relative block">
       <select
