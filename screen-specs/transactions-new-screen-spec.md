@@ -200,7 +200,7 @@
 | Step 3 borrow fields | Expected return date, deposit amount, item note per selected product | `Input`, `TextLabel` | Inline expandable selected row desktop; stacked mobile |
 | Step 3 pagination | Result range, previous/next/pages | Proposed shared `Pagination` | Compact previous/next on mobile |
 | Step 4 summary | Type, customer snapshot, address, items, borrow terms, note, preview totals, backend-authority notice | `Card`, `TextLabel` | 2-column summary desktop; single column mobile |
-| Footer actions | Cancel, Back, Next/Select loan/Confirm | `Button` | อยู่ใน document flow; ชิดล่าง viewport เมื่อ content สั้น และต่อท้าย content เมื่อยาว |
+| Footer actions | Cancel, Back, Next/Select loan/Confirm | Shared `PageFooter` + `Button` | Fixed ด้านล่าง พร้อม reserved spacer และ safe area เพื่อไม่บัง content |
 | Feedback | Inline errors, alert summary, toast, confirm-leave dialog | `Dialog`, `Toast` | Viewport-safe; error summaryอยู่ก่อน current step content |
 
 ### Step 1 type-card copy
@@ -486,7 +486,7 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
   - Step 1 ใช้ grid 3 cards แถวแรก + 2 cards แถวสอง
   - Step 2 ใช้ customer/address panels 2 columns
   - Step 3 product tableประมาณ 70% + sticky summary railประมาณ 30%
-  - Footer actionsชิดล่างของ content ไม่ fixed ทับ viewport
+  - Footer actions fixed ด้านล่างผ่าน shared `PageFooter` และมี reserved spacer ไม่ให้ทับ content
 - Tablet 768–1279px:
   - Stepperยังแนวนอนแต่ลดข้อความ
   - Step 2 panels stack
@@ -497,7 +497,7 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
   - Customer/address fields 1 column
   - Product tableเปลี่ยนเป็น stacked product rows: รูป + brand/weight + applicable price + quantity
   - Selected summaryเป็น accordion/sectionด้านล่าง ไม่เป็น off-canvas ที่ซ่อน primary information
-  - Footer action อยู่ท้าย document flow และมี safe spacing; ไม่ fixed/sticky ทับ field สุดท้าย
+  - Footer action fixed ที่ bottom safe area ผ่าน shared `PageFooter`; reserved spacer ต้องทำให้ไม่ทับ field สุดท้าย
 - Dense table strategy:
   - ไม่แสดง SKU/category/status/stock columns
   - ไม่ย่อ font ต่ำกว่าขนาดอ่านง่าย

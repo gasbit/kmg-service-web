@@ -17,6 +17,7 @@ import {
   TruckIcon,
   UsersIcon,
 } from "@/components/icon/icons";
+import { PageFooter } from "@/components/app-shell/page-footer";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -872,10 +873,9 @@ export function TransactionForm({
         </div>
       </div>
 
-      <div className="mt-auto border-t border-slate-200 bg-white px-4 py-3">
-        <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-3">
-          <Button disabled={submitPending} onClick={requestCancel} variant="secondary">ยกเลิก</Button>
-          <div className="flex items-center gap-3">
+      <PageFooter
+        actions={
+          <>
             {step > 1 ? <Button disabled={submitPending} leftIcon={<ArrowLeftIcon className="size-4" />} onClick={() => goToStep(step - 1)} variant="secondary">กลับ</Button> : null}
             {step < 4 ? (
               <Button
@@ -888,9 +888,10 @@ export function TransactionForm({
             ) : (
               <Button isLoading={submitPending} loadingText="กำลังสร้างรายการ" onClick={submit} rightIcon={<ArrowRightIcon className="size-4" />}>ยืนยันสร้างรายการ</Button>
             )}
-          </div>
-        </div>
-      </div>
+          </>
+        }
+        leading={<Button disabled={submitPending} onClick={requestCancel} variant="secondary">ยกเลิก</Button>}
+      />
 
       <Dialog
         description="ข้อมูลที่ยังไม่ได้บันทึกจะหายและไม่สามารถกู้คืนได้"
