@@ -52,7 +52,7 @@
 - แสดงตัวเลือก `RETURN_CYLINDER` และส่งต่อไป flow เลือกรายการยืมเดิม
 - Customer snapshot แบบกรอกใหม่: ชื่อ เบอร์โทร และที่อยู่
 - คง UI “ลูกค้าเดิม” และช่องค้นหาตามภาพในสถานะ disabled
-- คงกลุ่มประเภทเอกสาร/เลขเอกสารตามภาพในสถานะ disabled พร้อมคำอธิบายว่า API ยังไม่รองรับ
+- ตัดกลุ่มประเภทเอกสาร/เลขเอกสารออกจากหน้าจอ เพราะ API ไม่รองรับ
 - Product search/list/pagination จาก active product master
 - แสดงรูปสินค้า ยี่ห้อ น้ำหนัก ราคาตาม transaction type และจำนวนที่เลือก
 - Borrow fields ต่อสินค้า: วันที่คาดว่าจะคืนและเงินมัดจำ
@@ -98,7 +98,7 @@
 
 ### User-approved conflict resolutions
 
-- Customer UI: คงโครงตามภาพ แต่ `ลูกค้าเดิม` และการค้นหาลูกค้า disabled; `ลูกค้าใหม่` ถูกเลือกเป็นค่าเริ่มต้น
+- Customer UI: คงโครงตามภาพ แต่ customer mode และการค้นหาลูกค้า disabled; `ลูกค้าใหม่` แสดงเป็นค่าเริ่มต้น
 - Return cylinder: เลือกประเภทได้ แต่ปุ่มถัดไปส่งไป flow เลือกรายการยืมเดิมแทน wizard create ปกติ
 - Discount: ตัดออกทั้ง input, calculation และ payload
 - Product table: ไม่แสดง stock, SKU, category หรือสถานะ stock; แสดงเฉพาะข้อมูล Product API จริง
@@ -109,11 +109,11 @@
 - ภาษา UI หลักเป็นภาษาไทย; `New Transaction` ในภาพเปลี่ยนเป็นหัวข้อ `สร้างรายการใหม่` ให้ตรง navigation ปัจจุบัน
 - การเลือก `RETURN_CYLINDER` ยังไม่ navigate ทันที เพื่อป้องกันการแตะผิด; card ถูกเลือกก่อน แล้วปุ่มหลักเปลี่ยนข้อความเป็น `เลือกรายการยืม` และ navigate เมื่อกด
 - Handoff ใช้ `/loans?intent=return`; Loan feature ต้องอ่าน query นี้และเปิดมุมมอง active loans สำหรับเลือกคืน
-- ช่อง “ชื่อที่อยู่” เป็น label ชั่วคราวใน draft และไม่ถูก persist แยก
+- ช่อง “ชื่อที่อยู่” disabled เพราะไม่อยู่ใน transaction payload
 - ช่องที่อยู่แบบแยกส่วนถูกรวมเป็น `customerAddress` หนึ่ง string ก่อนส่ง โดยเรียง: ที่อยู่ → ตำบล/แขวง → อำเภอ/เขต → จังหวัด → รหัสไปรษณีย์ → หมายเหตุที่อยู่; ตัดช่องว่างหัวท้าย, ไม่รวมค่าที่ว่าง และเชื่อมส่วนด้วยช่องว่างหนึ่งตัว
 - จังหวัดใช้ `Select` ตามภาพ โดยอ่านรายการจาก proposed domain-neutral constant `src/lib/constants/thai-provinces.ts`; ต้องตรวจรายชื่อ 77 จังหวัดก่อน implement และไม่ต้องเรียก backend
 - Address note เป็นส่วนหนึ่งของ `customerAddress`; transaction-level `note` เป็น field แยกในขั้นยืนยัน
-- กลุ่มประเภทเอกสาร/เลขเอกสารยังคงตำแหน่งตามภาพแต่ disabled เพื่อไม่ให้ผู้ใช้กรอกข้อมูลที่ API ไม่ persist
+- กลุ่มประเภทเอกสาร/เลขเอกสารถูกตัดออกเพื่อไม่แสดงข้อมูลที่ API ไม่ persist
 - Product list แสดง active products เท่านั้น และใช้ backend pagination default `20` รายการต่อหน้า
 - Search product ทำเมื่อกด Enter/ปุ่มค้นหา หรือหยุดพิมพ์ 400 ms; ค้นเฉพาะ brand ตาม API
 - Preview price ใช้ current product master ที่โหลดมา แต่ข้อความกำกับต้องแจ้งว่า `ราคาสุดท้ายยืนยันโดยระบบเมื่อสร้างรายการ`
@@ -124,7 +124,7 @@
 
 - Blocker สำหรับ Return flow: loan list/return API และ frontend Loan feature ยังไม่มี implementation ที่ใช้งานได้ แม้ transaction contract กำหนดว่าต้องใช้ workflow นี้
 - Major: Customer API ยังไม่มี จึงไม่สามารถเปิด `ลูกค้าเดิม`, customer search หรือ `customerId`
-- Major: API ไม่มี document type/document number; UI ต้อง disabled จน contract ได้รับอนุมัติ
+- Major: API ไม่มี document type/document number; UI ถูกตัดออกจนกว่า contract ได้รับอนุมัติ
 - Major: Transaction API specification header ระบุว่า “ยังไม่มี implementation” แต่ routes/schema/service/repository/tests มี implementation แล้ว ควรอัปเดตสถานะเอกสาร backend
 - Major documentation mismatch: เอกสาร frontend เก่าบางส่วนใช้ `/api/v1` และ client-supplied pricing แต่ implementation จริงใช้ `/api` และ server-derived pricing; สเปกนี้ยึด implementation/transaction contract ปัจจุบัน
 - Minor: ยังไม่มี endpoint ที่ค้น product ด้วย weight หรือ sort ตามชื่อ; UI ห้ามแสดง control ที่สัญญาว่าทำได้
@@ -192,7 +192,7 @@
 | Stepper | 4 ขั้นพร้อม current/completed/upcoming state | Proposed shared `Stepper` | Desktop แนวนอน; mobile แสดง `ขั้น X จาก 4` + ชื่อ current step และ compact progress |
 | Step 1 heading | `เลือกประเภทรายการ` / `กรุณาเลือกประเภทรายการที่ต้องการทำ` | `TextLabel` | Center desktop; left aligned mobile |
 | Type cards | 5 transaction types พร้อมชื่อและคำอธิบาย | `Card`, `Button` semantics, shared transaction icons | 3+2 grid desktop; 2 columns tablet; 1 column mobile |
-| Step 2 customer panel | Customer mode, disabled search/document UI, name/phone | `Card`, `Input`, `Select`, `TextLabel` | 2 panels desktop; stack mobile |
+| Step 2 customer panel | Disabled customer mode/search, name/phone | `Card`, `Input`, `TextLabel` | 2 panels desktop; stack mobile |
 | Step 2 address panel | Address label, address, subdistrict, district, province, postal code, note | `Card`, `Input`, proposed shared `Textarea`, `Select` | 3-column subfields desktop; stack mobile |
 | Step 3 toolbar | Brand search and clear search | `Input`, `Button`, `SearchIcon` | One row desktop; stack mobile |
 | Step 3 product table | Image, brand/weight, applicable price, quantity selector, selected amount | `Table`, `Input`/quantity control, shared icons | Desktop table; mobile stacked product rows |
@@ -227,7 +227,7 @@
 | Document number | No API field | Not available | disabled | ห้ามเก็บหรือส่ง |
 | ชื่อ-นามสกุล/ชื่อลูกค้า | `customerName` | Required | trim, 1–150 chars | Snapshot; backend authority |
 | เบอร์โทรศัพท์ | `customerPhone` | Optional | trim; fallback `—` | Snapshot; max 50 |
-| ชื่อที่อยู่ | Draft only | Optional | เช่น `บ้าน`, `ที่ทำงาน` | ไม่ persist แยก |
+| ชื่อที่อยู่ | ไม่มี API field | Disabled พร้อม badge `ไม่บันทึกใน API` | Placeholder `ชื่อเรียก เช่น บ้าน หรือที่ทำงาน` | ไม่ส่ง API |
 | ที่อยู่ | ส่วนหนึ่งของ `customerAddress` | Conditional | multiline plain text | Required for delivery |
 | ตำบล/แขวง | ส่วนหนึ่งของ `customerAddress` | Optional | plain text | Client composes |
 | อำเภอ/เขต | ส่วนหนึ่งของ `customerAddress` | Optional | plain text | Client composes |
@@ -391,7 +391,7 @@
 | Initial route loading | App shell + skeleton header/step content; `กำลังเตรียมหน้าสร้างรายการ` | Sidebarตาม loading policy | Product read success/error |
 | Step 1 initial | ไม่มี card selected; `กรุณาเลือกประเภทรายการที่ต้องการทำ` | เลือกประเภท, ยกเลิก | เลือกแล้วเปิดปุ่มหลัก |
 | Return selected | Card `คืนถัง` selected; info `การคืนถังต้องเลือกรายการยืมเดิม` | `เลือกรายการยืม`, ยกเลิก | `/loans?intent=return` |
-| Customer step ready | `ลูกค้าใหม่` selected; old customer/document controls disabled | กรอกข้อมูล, กลับ, ถัดไป | Valid → step 3 |
+| Customer step ready | `ลูกค้าใหม่` แสดงเป็นค่าเริ่มต้น; customer mode/search/address label disabled; document controls removed | กรอกข้อมูล, กลับ, ถัดไป | Valid → step 3 |
 | Product loading/searching | Table skeleton; current selected summaryคงอยู่ | Back; search disabledช่วง requestสั้น | Success/error |
 | Product populated | Active products + current page/meta | Search, page, +/- quantity, next | Selection updates summary |
 | Product empty master | `ยังไม่มีสินค้าที่ใช้งานได้` | `ไปเพิ่มสินค้า`, กลับ | `/products/new` |
@@ -443,14 +443,12 @@
 
 | Field | Input/control | Frontend guidance | Backend-authoritative rule | Error copy |
 | --- | --- | --- | --- | --- |
-| ลูกค้าใหม่ | Radio selected | Only enabled mode | No `customerId` create input | — |
+| ลูกค้าใหม่ | Disabled radio selected | Display-only mode | No `customerId` create input | — |
 | ลูกค้าเดิม | Disabled radio | Copy `ยังไม่เปิดใช้งาน` | Customer API unavailable | — |
 | ค้นหาลูกค้า | Disabled search | Placeholderตามภาพ | No API | — |
-| ประเภทเอกสาร | Disabled select | `ยังไม่รองรับใน MVP` | No API field | — |
-| เลขที่เอกสาร | Disabled text | `ยังไม่รองรับใน MVP` | No API field | — |
 | ชื่อ-นามสกุล | Text | Required; trim; max 150 | Required every create type | `กรุณาระบุชื่อลูกค้าไม่เกิน 150 ตัวอักษร` |
 | เบอร์โทรศัพท์ | `tel` | Optional; max 50; numeric-friendly keyboard | Optional string max 50 | `เบอร์โทรศัพท์ต้องไม่เกิน 50 ตัวอักษร` |
-| ชื่อที่อยู่ | Text | Optional UI label | Not persisted | — |
+| ชื่อที่อยู่ | Disabled text | Placeholder พร้อม badge `ไม่บันทึกใน API` | Not persisted | — |
 | ที่อยู่ | Textarea | Required for delivery; optional otherwise | `customerAddress` required only delivery | `กรุณาระบุที่อยู่สำหรับจัดส่ง` |
 | ตำบล/แขวง | Text | Optional | Part of address string | — |
 | อำเภอ/เขต | Text | Optional | Part of address string | — |
@@ -519,7 +517,7 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
   - Card ทั้งใบ clickได้แต่มี accessible nameจากชื่อและคำอธิบาย
 - Labels:
   - ทุก inputมี programmatic label
-  - Disabled customer/document controlsเชื่อมคำอธิบายด้วย `aria-describedby`
+  - Disabled customer/address-label controlsเชื่อมคำอธิบายด้วย `aria-describedby`
 - Product list:
   - Desktop tableมี caption
   - รูปมี alt `รูปสินค้า {brand} {weight} กก.`
@@ -547,7 +545,7 @@ Frontend validation เป็น assistive เท่านั้น ต้อง
 1. Given Admin มี sessionถูกต้อง เมื่อเปิด `/transactions/new` แล้วเห็น app shell, header `สร้างรายการใหม่`, step 1 และ type cardsครบ 5 แบบ.
 2. Given ยังไม่เลือก type เมื่อกด/ตรวจปุ่มหลักแล้วปุ่ม `ถัดไป` disabled และไม่มีการเปลี่ยน step.
 3. Given เลือก `RETURN_CYLINDER` เมื่อกดปุ่มหลักแล้ว navigate ไป `/loans?intent=return` โดยไม่เรียก `POST /transactions`.
-4. Given อยู่ step 2 เมื่อดู customer mode แล้ว `ลูกค้าใหม่` selected ส่วน `ลูกค้าเดิม`, customer search, document type และ document number disabled พร้อมคำอธิบาย.
+4. Given อยู่ step 2 เมื่อดู customer mode แล้ว `ลูกค้าใหม่` แสดงเป็นค่าเริ่มต้น แต่ customer mode, customer search และชื่อที่อยู่ disabled; document type และ document number ไม่แสดง.
 5. Given create typeใด ๆ เมื่อ customer nameว่างแล้วกดถัดไป จะคงอยู่ step 2, แสดง `กรุณาระบุชื่อลูกค้า...` และ focus field.
 6. Given `DELIVERY_EXCHANGE` เมื่อ addressว่างแล้วกดถัดไป จะไม่เข้า step 3 และแสดง `กรุณาระบุที่อยู่สำหรับจัดส่ง`.
 7. Given non-delivery type เมื่อ addressว่างแต่ customer nameถูกต้อง แล้วสามารถเข้า step 3 ได้.

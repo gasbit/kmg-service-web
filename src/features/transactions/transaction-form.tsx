@@ -244,36 +244,36 @@ function CustomerStep({
             <span className="grid size-10 place-items-center rounded-xl bg-blue-50 text-blue-600"><UsersIcon className="size-5" /></span>
             ข้อมูลลูกค้า
           </h3>
-          <div className="mt-6 flex flex-wrap gap-5">
-            <label className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-800">
-              <input checked className="size-4 accent-blue-600" name="customerMode" readOnly type="radio" />
+          <div className="mt-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-slate-50/80 p-1.5">
+            <label className="inline-flex min-h-10 cursor-not-allowed items-center gap-2 rounded-lg border border-blue-100 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm">
+              <input checked className="sr-only" disabled name="customerMode" type="radio" />
+              <span aria-hidden="true" className="grid size-4 place-items-center rounded-full border border-brand-blue bg-white">
+                <span className="size-2 rounded-full bg-brand-blue" />
+              </span>
               ลูกค้าใหม่
+              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">โหมดปัจจุบัน</span>
             </label>
-            <label aria-describedby="existing-customer-description" className="inline-flex min-h-11 cursor-not-allowed items-center gap-2 text-sm font-semibold text-slate-400">
-              <input className="size-4" disabled name="customerMode" type="radio" />
+            <label aria-describedby="existing-customer-description" className="inline-flex min-h-10 cursor-not-allowed items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-400">
+              <input className="sr-only" disabled name="customerMode" type="radio" />
+              <span aria-hidden="true" className="size-4 rounded-full border border-slate-300 bg-white" />
               ลูกค้าเดิม
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px]">ยังไม่เปิดใช้งาน</span>
+              <span className="rounded-full bg-slate-200/70 px-2 py-0.5 text-[10px] font-bold text-slate-500">ยังไม่เปิดใช้งาน</span>
             </label>
           </div>
           <p className="sr-only" id="existing-customer-description">ระบบค้นหาลูกค้าเดิมยังไม่เปิดใช้งานใน MVP</p>
           <div className="mt-4">
             <Field label="ค้นหาลูกค้า">
-              <Input disabled leftIcon={<SearchIcon className="size-5" />} placeholder="ค้นหาด้วยชื่อ เบอร์โทร หรือเลขเอกสาร" wrapperClassName="h-12 bg-slate-50" />
+              <Input
+                disabled
+                leftIcon={<SearchIcon className="size-5" />}
+                placeholder="ค้นหาด้วยชื่อหรือเบอร์โทร"
+                rightElement={<span className="hidden whitespace-nowrap rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-500 ring-1 ring-slate-200 sm:inline-flex">ยังไม่เปิดใช้งาน</span>}
+                wrapperClassName="h-12"
+              />
             </Field>
           </div>
           <div className="my-5 flex items-center gap-3 text-xs font-medium text-slate-400 before:h-px before:flex-1 before:bg-slate-200 after:h-px after:flex-1 after:bg-slate-200">ข้อมูลที่บันทึกได้</div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
-              <Field label="ประเภทเอกสาร">
-                <Select aria-describedby="document-disabled-copy" className="h-12 bg-slate-50" disabled>
-                  <option>ยังไม่รองรับใน MVP</option>
-                </Select>
-              </Field>
-              <Field label="เลขที่เอกสาร">
-                <Input aria-describedby="document-disabled-copy" disabled placeholder="ยังไม่รองรับใน MVP" wrapperClassName="h-12 bg-slate-50" />
-              </Field>
-            </div>
-            <p className="sr-only" id="document-disabled-copy">ข้อมูลเอกสารยังไม่มี API สำหรับบันทึก</p>
             <div className="sm:col-span-2">
               <Field error={errors.customerName} label="ชื่อ-นามสกุล / ชื่อลูกค้า">
                 <Input
@@ -308,9 +308,17 @@ function CustomerStep({
             {transactionType === TRANSACTION_TYPES.DELIVERY_EXCHANGE ? "ที่อยู่จัดส่ง" : "ที่อยู่ลูกค้า"}
           </h3>
           <div className="mt-6 grid gap-4">
-            <Field label="ชื่อที่อยู่" optional>
-              <Input onChange={(event) => onChange("addressLabel", event.target.value)} placeholder="เช่น บ้าน, ที่ทำงาน" value={customer.addressLabel} wrapperClassName="h-12" />
+            <Field label="ชื่อที่อยู่">
+              <Input
+                aria-describedby="address-label-disabled-copy"
+                disabled
+                placeholder="ชื่อเรียก เช่น บ้าน หรือที่ทำงาน"
+                rightElement={<span className="hidden whitespace-nowrap rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-500 ring-1 ring-slate-200 sm:inline-flex">ไม่บันทึกใน API</span>}
+                value={customer.addressLabel}
+                wrapperClassName="h-12"
+              />
             </Field>
+            <p className="sr-only" id="address-label-disabled-copy">ชื่อที่อยู่ไม่ได้อยู่ใน payload ของ Transaction API</p>
             <Field error={errors.address} label="ที่อยู่" optional={transactionType !== TRANSACTION_TYPES.DELIVERY_EXCHANGE}>
               <Textarea
                 aria-invalid={Boolean(errors.address)}
