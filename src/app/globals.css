@@ -92,6 +92,20 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+input[data-ui="input"] {
+  color-scheme: light;
+}
+
+input[data-ui="input"]:-webkit-autofill,
+input[data-ui="input"]:-webkit-autofill:hover,
+input[data-ui="input"]:-webkit-autofill:focus,
+input[data-ui="input"]:-webkit-autofill:active {
+  caret-color: #0f172a;
+  -webkit-text-fill-color: #0f172a;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+}
+
 @keyframes toast-enter {
   from {
     opacity: 0;

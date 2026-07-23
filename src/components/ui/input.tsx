@@ -26,6 +26,7 @@ export function Input({
     >
       {leftIcon}
       <input
+        data-ui="input"
         className={cn(
           "h-full min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400",
           inputClassName,
