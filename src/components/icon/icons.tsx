@@ -74,6 +74,13 @@ export function PackageIcon(props: IconProps) { return <Icon {...props}><path d=
 export function CheckCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="m8 12 2.5 2.5L16 9" {...stroke} /></Icon>; }
 export function PauseCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M10 9v6m4-6v6" {...stroke} /></Icon>; }
 export function ArrowLeftIcon(props: IconProps) { return <Icon {...props}><path d="m15 18-6-6 6-6" {...stroke} /></Icon>; }
+export function ArrowRightIcon(props: IconProps) { return <Icon {...props}><path d="m9 18 6-6-6-6" {...stroke} /></Icon>; }
+export function MinusIcon(props: IconProps) { return <Icon {...props}><path d="M5 12h14" {...stroke} /></Icon>; }
+export function InfoIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M12 11v5m0-8h.01" {...stroke} /></Icon>; }
+export function MapPinIcon(props: IconProps) { return <Icon {...props}><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" {...stroke} /><circle cx="12" cy="10" r="2.5" {...stroke} /></Icon>; }
+export function UsersIcon(props: IconProps) { return <Icon {...props}><path d="M16 20v-1.5a4.5 4.5 0 0 0-9 0V20m4.5-8a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-4a3 3 0 0 1 0 6m1.5 1c1.7.8 2.5 2 2.5 4" {...stroke} /></Icon>; }
+export function StorefrontIcon(props: IconProps) { return <Icon {...props}><path d="M4 9v11h16V9M3 9l2-5h14l2 5M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M9 20v-6h6v6" {...stroke} /></Icon>; }
+export function CartIcon(props: IconProps) { return <Icon {...props}><path d="M3 4h2l2 11h10l3-8H6m3 12h.01M17 19h.01" {...stroke} /></Icon>; }
 export function UploadIcon(props: IconProps) { return <Icon {...props}><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5" {...stroke} /></Icon>; }
 export function ImageIcon(props: IconProps) { return <Icon {...props}><rect height="16" rx="2" width="18" x="3" y="4" {...stroke} /><circle cx="8.5" cy="9" r="1.5" {...stroke} /><path d="m5 18 4.5-4.5 3 3 2-2L19 18" {...stroke} /></Icon>; }
 

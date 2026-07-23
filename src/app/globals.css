@@ -108,8 +108,25 @@ a {
   animation: toast-enter 180ms ease-out both;
 }
 
+@keyframes wizard-step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wizard-step-enter {
+  animation: wizard-step-enter 220ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .toast-enter {
+  .toast-enter,
+  .wizard-step-enter {
     animation: none;
   }
 }
