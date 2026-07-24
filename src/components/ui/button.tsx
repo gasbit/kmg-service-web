@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import Link from "next/link";
+import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 import { LoadingSpinner } from "./loading";
 
@@ -10,6 +11,14 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   isLoading?: boolean;
   leftIcon?: ReactNode;
   loadingText?: string;
+  rightIcon?: ReactNode;
+  size?: ButtonSize;
+  variant?: ButtonVariant;
+};
+
+type ButtonLinkProps = ComponentProps<typeof Link> & {
+  fullWidth?: boolean;
+  leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   size?: ButtonSize;
   variant?: ButtonVariant;
@@ -65,5 +74,33 @@ export function Button({
       {isLoading && loadingText ? loadingText : children}
       {isLoading ? null : rightIcon}
     </button>
+  );
+}
+
+export function ButtonLink({
+  children,
+  className,
+  fullWidth = false,
+  leftIcon,
+  rightIcon,
+  size = "md",
+  variant = "primary",
+  ...props
+}: ButtonLinkProps) {
+  return (
+    <Link
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center gap-3 font-bold transition focus:outline-none focus:ring-4",
+        buttonVariants[variant],
+        buttonSizes[size],
+        fullWidth && "w-full",
+        className,
+      )}
+      {...props}
+    >
+      {leftIcon}
+      {children}
+      {rightIcon}
+    </Link>
   );
 }

@@ -65,6 +65,28 @@ export type TransactionDetail = {
   completedAt: string | null;
 };
 
+export type TransactionSummary = Omit<TransactionDetail, "customerId" | "items" | "statusLogs"> & {
+  itemCount: number;
+  totalQuantity: number;
+};
+
+export type TransactionListQuery = {
+  dateFrom?: string;
+  dateTo?: string;
+  limit?: number;
+  page?: number;
+  search?: string;
+  status?: TransactionStatus;
+  transactionType?: TransactionType;
+};
+
+export type TransactionPagination = {
+  limit: number;
+  page: number;
+  totalItems: number;
+  totalPages: number;
+};
+
 export type CustomerDraft = {
   customerName: string;
   customerPhone: string;

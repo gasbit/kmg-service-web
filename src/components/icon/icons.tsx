@@ -73,6 +73,8 @@ export function TrashIcon(props: IconProps) { return <Icon {...props}><path d="M
 export function PackageIcon(props: IconProps) { return <Icon {...props}><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10" {...stroke} /></Icon>; }
 export function CheckCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="m8 12 2.5 2.5L16 9" {...stroke} /></Icon>; }
 export function PauseCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M10 9v6m4-6v6" {...stroke} /></Icon>; }
+export function ClockIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="M12 7v5l3 2" {...stroke} /></Icon>; }
+export function CloseCircleIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" {...stroke} /><path d="m9 9 6 6m0-6-6 6" {...stroke} /></Icon>; }
 export function ArrowLeftIcon(props: IconProps) { return <Icon {...props}><path d="m15 18-6-6 6-6" {...stroke} /></Icon>; }
 export function ArrowRightIcon(props: IconProps) { return <Icon {...props}><path d="m9 18 6-6-6-6" {...stroke} /></Icon>; }
 export function MinusIcon(props: IconProps) { return <Icon {...props}><path d="M5 12h14" {...stroke} /></Icon>; }
